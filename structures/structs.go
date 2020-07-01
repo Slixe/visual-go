@@ -15,6 +15,13 @@ type IPanel interface {
 
 type IComponent interface {
 	Show(app IApp)
+	GetBaseComponent() BaseComponent
+}
+
+type ISelectableComponent interface {
+	IComponent
+	SetSelected(value bool)
+	IsSelected() bool
 }
 
 type BaseComponent struct {

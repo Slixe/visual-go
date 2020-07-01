@@ -28,3 +28,7 @@ func CreateLabel(label string, color raylib.Color, posX float32, posY float32, w
 func (label Label) Show(app structures.IApp) {
 	raylib.GuiLabel(graphics.CreateRectangle(label.BaseComponent), label.Label)
 }
+
+func (label Label) GetBaseComponent() structures.BaseComponent {
+	return label.BaseComponent
+}

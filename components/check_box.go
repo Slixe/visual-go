@@ -36,3 +36,7 @@ func (checkBox *CheckBox) Show(app structures.IApp) {
 		checkBox.Checked = c
 	}
 }
+
+func (checkBox CheckBox) GetBaseComponent() structures.BaseComponent {
+	return checkBox.BaseComponent
+}

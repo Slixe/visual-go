@@ -29,3 +29,7 @@ func (btn LabelButton) Show(app structures.IApp) {
 		btn.Callback(btn)
 	}
 }
+
+func (btn LabelButton) GetBaseComponent() structures.BaseComponent {
+	return btn.BaseComponent
+}

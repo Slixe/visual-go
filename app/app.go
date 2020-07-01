@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	rl "github.com/DankFC/raylib-goplus/raylib"
 	"github.com/Slixe/visual-go/structures"
 )
@@ -19,17 +20,48 @@ func (app App) Start() {
 }
 
 func (app *App) Render() {
+	var currentSelected structures.ISelectableComponent
+
 	for !rl.WindowShouldClose() {
+		var selectables []structures.ISelectableComponent
+		var components []structures.IComponent
+		hasTextFieldSelected := false
+
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
 		if app.currentPanel != nil {
 			app.currentPanel.Show(app)
-			for _, component := range app.currentPanel.GetComponents() {
-				component.Show(app)
-			}
+			components = app.currentPanel.GetComponents()
 		}
-		for _, component := range app.GetGlobalComponents() {
+		components = append(components, app.GetGlobalComponents()...)
+		for _, component := range components {
+			if selectable, ok := component.(structures.ISelectableComponent); ok {
+				if selectable.IsSelected() {
+					if hasTextFieldSelected {
+						selectable.SetSelected(false)
+					}
+
+					hasTextFieldSelected = true
+				}
+				selectables = append(selectables, selectable)
+			}
 			component.Show(app)
+		}
+
+		if len(selectables) > 0 && !hasTextFieldSelected {
+			selectables[0].SetSelected(true) //we select first by default
+			currentSelected = selectables[0]
+		}
+
+		mousePos := rl.GetMousePosition()
+		for _, selectable := range selectables {
+			base := selectable.GetBaseComponent()
+			if rl.IsMouseButtonPressed(rl.MouseLeftButton) && base.PosX <= mousePos.X && base.PosX + base.Width >= mousePos.X && base.PosY <= mousePos.Y && base.PosY + base.Height >= mousePos.Y {
+				currentSelected.SetSelected(false)
+				selectable.SetSelected(true)
+				currentSelected = selectable
+				fmt.Println(selectable.IsSelected())
+			}
 		}
 		rl.EndDrawing()
 	}

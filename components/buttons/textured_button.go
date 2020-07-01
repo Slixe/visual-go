@@ -36,3 +36,7 @@ func (btn TexturedButton) Show(app structures.IApp) {
 		btn.Callback(btn)
 	}
 }
+
+func (btn TexturedButton) GetBaseComponent() structures.BaseComponent {
+	return btn.BaseComponent
+}
