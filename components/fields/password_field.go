@@ -1,7 +1,6 @@
 package fields
 
 import (
-	"fmt"
 	rl "github.com/DankFC/raylib-goplus/raylib"
 	"github.com/Slixe/visual-go/graphics"
 	"github.com/Slixe/visual-go/structures"
@@ -42,7 +41,6 @@ func (field *PasswordField) Show(app structures.IApp) {
 	_, str := rl.GuiTextBox(graphics.CreateRectangle(field.BaseComponent), strings.Repeat("*", len(field.Text)), field.MaxCharacters, editable)
 
 	if len(field.Text) != len(str) {
-		fmt.Println(field.Text, str)
 		if len(str) < len(field.Text) && len(field.Text) > 0 {
 			field.Text = field.Text[:len(field.Text)-1]
 		} else {

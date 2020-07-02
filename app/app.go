@@ -1,22 +1,30 @@
 package app
 
 import (
-	"fmt"
 	rl "github.com/DankFC/raylib-goplus/raylib"
 	"github.com/Slixe/visual-go/structures"
 )
 
 type App struct {
-	currentPanel structures.IPanel
 	Title        string
 	Width        int
 	Height       int
-	Components   []structures.IComponent //globals components
+	Resizable 	 bool
+	Font         rl.Font
+	currentPanel structures.IPanel
+	components   []structures.IComponent //globals components
 }
 
 func (app App) Start() {
+	if app.Resizable {
+		rl.SetConfigFlags(rl.FlagWindowResizable)
+	}
 	rl.InitWindow(app.Width, app.Height, app.Title)
+	rl.SetWindowMinSize(app.Width, app.Height)
 	rl.SetTargetFPS(60)
+	if &app.Font != nil {
+		rl.GuiSetFont(app.Font)
+	}
 }
 
 func (app *App) Render() {
@@ -25,7 +33,6 @@ func (app *App) Render() {
 	for !rl.WindowShouldClose() {
 		var selectables []structures.ISelectableComponent
 		var components []structures.IComponent
-		hasTextFieldSelected := false
 
 		rl.BeginDrawing()
 		rl.ClearBackground(rl.RayWhite)
@@ -36,19 +43,12 @@ func (app *App) Render() {
 		components = append(components, app.GetGlobalComponents()...)
 		for _, component := range components {
 			if selectable, ok := component.(structures.ISelectableComponent); ok {
-				if selectable.IsSelected() {
-					if hasTextFieldSelected {
-						selectable.SetSelected(false)
-					}
-
-					hasTextFieldSelected = true
-				}
 				selectables = append(selectables, selectable)
 			}
 			component.Show(app)
 		}
 
-		if len(selectables) > 0 && !hasTextFieldSelected {
+		if len(selectables) > 0 && currentSelected == nil {
 			selectables[0].SetSelected(true) //we select first by default
 			currentSelected = selectables[0]
 		}
@@ -60,7 +60,6 @@ func (app *App) Render() {
 				currentSelected.SetSelected(false)
 				selectable.SetSelected(true)
 				currentSelected = selectable
-				fmt.Println(selectable.IsSelected())
 			}
 		}
 		rl.EndDrawing()
@@ -81,21 +80,47 @@ func (app *App) SetPanel(panel structures.IPanel) {
 }
 
 func (app App) GetWidth() int {
-	return app.Width
+	return rl.GetScreenWidth()
 }
 
 func (app App) GetHeight() int {
+	return rl.GetScreenHeight()
+}
+
+func (app App) GetMinWidth() int {
+	return app.Width
+}
+
+func (app App) GetMinHeight() int {
 	return app.Height
 }
 
 func (app *App) ClearGlobalComponents() {
-	app.Components = []structures.IComponent{}
+	app.components = []structures.IComponent{}
 }
 
 func (app *App) AddGlobalComponent(component structures.IComponent) {
-	app.Components = append(app.Components, component)
+	app.components = append(app.components, component)
 }
 
 func (app App) GetGlobalComponents() []structures.IComponent {
-	return app.Components
+	return app.components
+}
+
+func (app App) SetWindowTitle(title string) {
+	rl.SetWindowTitle(title)
+}
+
+func (app App) SetWindowSize(width int, height int) {
+	rl.SetWindowSize(width, height)
+}
+
+func (app App) SetWindowIcon(imagePath string) {
+	img := *rl.LoadImage(imagePath)
+	rl.SetWindowIcon(img)
+}
+
+func (app *App) SetGuiFont(font rl.Font) {
+	app.Font = font
+	rl.GuiSetFont(font)
 }
