@@ -10,7 +10,9 @@ type App struct {
 	Width        int
 	Height       int
 	Resizable 	 bool
-	Font         rl.Font
+	DefaultColor rl.Color
+	OnSizeChanged func()
+	font         *rl.Font
 	currentPanel structures.IPanel
 	components   []structures.IComponent //globals components
 }
@@ -22,20 +24,30 @@ func (app App) Start() {
 	rl.InitWindow(app.Width, app.Height, app.Title)
 	rl.SetWindowMinSize(app.Width, app.Height)
 	rl.SetTargetFPS(60)
-	if &app.Font != nil {
-		rl.GuiSetFont(app.Font)
+	if app.font != nil {
+		rl.GuiSetFont(*app.font)
 	}
 }
 
 func (app *App) Render() {
 	var currentSelected structures.ISelectableComponent
 
+	lastWidth := app.GetWidth()
+	lastHeight := app.GetHeight()
+
 	for !rl.WindowShouldClose() {
 		var selectables []structures.ISelectableComponent
 		var components []structures.IComponent
 
 		rl.BeginDrawing()
-		rl.ClearBackground(rl.RayWhite)
+		rl.ClearBackground(app.DefaultColor)
+
+		if app.OnSizeChanged != nil && (lastHeight != app.GetHeight() || lastWidth != app.GetWidth()) {
+			app.OnSizeChanged()
+			lastWidth = app.GetWidth()
+			lastHeight = app.GetHeight()
+		}
+
 		if app.currentPanel != nil {
 			app.currentPanel.Show(app)
 			components = app.currentPanel.GetComponents()
@@ -120,7 +132,7 @@ func (app App) SetWindowIcon(imagePath string) {
 	rl.SetWindowIcon(img)
 }
 
-func (app *App) SetGuiFont(font rl.Font) {
-	app.Font = font
-	rl.GuiSetFont(font)
+func (app *App) SetGuiFont(font *rl.Font) {
+	app.font = font
+	rl.GuiSetFont(*app.font)
 }

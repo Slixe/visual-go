@@ -9,9 +9,13 @@ var OffsetX = float32(0)
 var OffsetY = float32(0)
 
 func DrawTexture(texture rl.Texture2D, posX float32, posY float32, width float32, height float32, rotation float32) {
+	DrawTexturePro(texture, posX, posY, width, height, rotation, rl.RayWhite)
+}
+
+func DrawTexturePro(texture rl.Texture2D, posX float32, posY float32, width float32, height float32, rotation float32, color rl.Color) {
 	rect := rl.Rectangle{Y: OffsetY + posY, X: OffsetX + posX, Width: float32(texture.Width), Height: float32(texture.Height)}
 	dst := rl.Rectangle{Y: OffsetY + posY, X: OffsetX + posX, Width: width, Height: height}
-	rl.DrawTexturePro(texture, rect, dst, rl.Vector2{X: 0, Y: 0}, rotation, rl.RayWhite)
+	rl.DrawTexturePro(texture, rect, dst, rl.Vector2{X: 0, Y: 0}, rotation, color)
 }
 
 func CreateRectangle(component structures.BaseComponent) rl.Rectangle {

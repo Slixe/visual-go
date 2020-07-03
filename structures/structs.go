@@ -12,7 +12,7 @@ type IApp interface {
 	SetWindowTitle(title string)
 	SetWindowSize(width int, height int)
 	SetWindowIcon(imagePath string)
-	SetGuiFont(font rl.Font)
+	SetGuiFont(font *rl.Font)
 }
 
 type IPanel interface {
