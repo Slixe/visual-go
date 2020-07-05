@@ -20,7 +20,7 @@ func CreateTexturedPanel(texturePath string) *TexturedPanel {
 }
 
 func (panel TexturedPanel) Show(graphics structures.IGraphics, app structures.IApp) {
-	graphics.DrawTexture(panel.BackgroundTexture, 0, 0, float32(app.GetWidth()), float32(app.GetHeight()), 0)
+	graphics.DrawTexturePro(panel.BackgroundTexture, 0, 0, float32(app.GetWidth()), float32(app.GetHeight()), 0, rl.White)
 }
 
 func (panel TexturedPanel) GetComponents() []structures.IComponent {

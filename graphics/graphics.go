@@ -12,12 +12,20 @@ type Graphics struct {
 	maxHeight float32
 }
 
-func (g Graphics) DrawTexture(texture rl.Texture2D, posX float32, posY float32, width float32, height float32, rotation float32) {
-	g.DrawTexturePro(texture, posX, posY, width, height, rotation, rl.RayWhite)
+func (g Graphics) DrawTexture(texture rl.Texture2D, posX float32, posY float32, color rl.Color) {
+	rl.DrawTexture(texture, int(g.posX + posX), int(g.posY + posY), color)
 }
 
 func (g Graphics) DrawTexturePro(texture rl.Texture2D, posX float32, posY float32, width float32, height float32, rotation float32, color rl.Color) {
-	rect := rl.Rectangle{Y: g.posY + posY, X: g.posX + posX, Width: float32(texture.Width), Height: float32(texture.Height)}
+	if posX + width > g.maxWidth {
+		width = g.maxWidth - posX
+	}
+
+	if posY + height > g.maxHeight {
+		height = g.maxHeight - posY
+	}
+
+	rect := rl.Rectangle{Y: 0, X: 0, Width: float32(texture.Width), Height: float32(texture.Height)}
 	dst := rl.Rectangle{Y: g.posY + posY, X: g.posX + posX, Width: width, Height: height}
 	rl.DrawTexturePro(texture, rect, dst, rl.Vector2{X: 0, Y: 0}, rotation, color)
 }

@@ -40,7 +40,7 @@ type IPanel interface {
 }
 
 type IGraphics interface {
-	DrawTexture(texture rl.Texture2D, posX float32, posY float32, width float32, height float32, rotation float32)
+	DrawTexture(texture rl.Texture2D, posX float32, posY float32, color rl.Color)
 	DrawTexturePro(texture rl.Texture2D, posX float32, posY float32, width float32, height float32, rotation float32, color rl.Color)
 	DrawTextDefaultFont(text string, posX int, posY int, fontSize int, color rl.Color)
 	DrawText(font rl.Font, text string, posX float32, posY float32, fontSize float32, spacing float32, color rl.Color)

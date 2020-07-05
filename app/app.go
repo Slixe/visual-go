@@ -47,7 +47,8 @@ func (app *App) Render() {
 	globalLayout := graphics.CreateGraphics(*app.Flex.RootNode)
 	for !rl.WindowShouldClose() {
 		var selectables []structures.ISelectableComponent
-		var components []structures.IComponent
+		var components = make(map[graphics.Graphics][]structures.IComponent)
+
 		g := globalLayout
 
 		rl.BeginDrawing()
@@ -58,38 +59,35 @@ func (app *App) Render() {
 			lastHeight = app.GetHeight()
 
 			app.CalculateLayout()
+			globalLayout = graphics.CreateGraphics(*app.Flex.RootNode)
+		}
+
+		if app.globalPanel != nil {
+			app.globalPanel.Show(globalLayout, app)
+			components[g] = append(components[g], app.globalPanel.GetComponents()...)
 		}
 
 		for _, panel := range app.panels {
 			if panel.GetLayout() != nil {
-				panel.Show(graphics.CreateGraphics(*panel.GetLayout()), app)
+				g = graphics.CreateGraphics(*panel.GetLayout())
 			} else {
-				panel.Show(globalLayout, app)
+				g = globalLayout
 			}
 
-			components = append(components, panel.GetComponents()...)
-		}
+			panel.Show(g, app)
 
-		if app.globalPanel != nil {
-			layout := app.globalPanel.GetLayout()
-			if layout != nil {
-				g = graphics.CreateGraphics(*layout)
-			}
-			app.globalPanel.Show(g, app)
-			components = append(components, app.globalPanel.GetComponents()...)
+			components[g] = append(components[g], panel.GetComponents()...)
 		}
 
 		globalComponents := app.GetGlobalComponents()
-		components = append(components, globalComponents...)
-		for i, component := range components {
-			if selectable, ok := component.(structures.ISelectableComponent); ok {
-				selectables = append(selectables, selectable)
-			}
+		components[globalLayout] = append(components[globalLayout], globalComponents...)
+		for graph, comps := range components {
+			for _, component := range comps {
+				if selectable, ok := component.(structures.ISelectableComponent); ok {
+					selectables = append(selectables, selectable)
+				}
 
-			if i > len(components) - len(globalComponents) {
-				component.Show(globalLayout, app)
-			} else {
-				component.Show(g, app)
+				component.Show(graph, app)
 			}
 		}
 
