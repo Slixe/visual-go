@@ -6,6 +6,9 @@ import (
 )
 
 type IApp interface {
+	Close()
+	CalculateLayout()
+	SetMainLayout(node *flex.Node)
 	GetGlobalPanel() IPanel
 	SetGlobalPanel(panel IPanel)
 	GetWidth() int
