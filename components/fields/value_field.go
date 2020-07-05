@@ -2,7 +2,6 @@ package fields
 
 import (
 	rl "github.com/DankFC/raylib-goplus/raylib"
-	"github.com/Slixe/visual-go/graphics"
 	"github.com/Slixe/visual-go/structures"
 )
 
@@ -35,7 +34,7 @@ func CreateValueField(text string, value int, minValue int, maxValue int, editab
 	}
 }
 
-func (field *ValueField) Show(app structures.IApp) {
+func (field *ValueField) Show(graphics structures.IGraphics, app structures.IApp) {
 	editable := field.Editable
 	if editable {
 		editable = field.Selected

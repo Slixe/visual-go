@@ -2,7 +2,6 @@ package buttons
 
 import (
 	rl "github.com/DankFC/raylib-goplus/raylib"
-	"github.com/Slixe/visual-go/graphics"
 	"github.com/Slixe/visual-go/structures"
 )
 
@@ -24,7 +23,7 @@ func CreateLabelButton(label string, posX float32, posY float32, width float32, 
 		Callback: callback,
 	}
 }
-func (btn LabelButton) Show(app structures.IApp) {
+func (btn LabelButton) Show(graphics structures.IGraphics, app structures.IApp) {
 	if rl.GuiLabelButton(graphics.CreateRectangle(btn.BaseComponent), btn.Label) {
 		btn.Callback(btn)
 	}

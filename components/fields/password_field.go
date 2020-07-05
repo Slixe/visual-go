@@ -2,7 +2,6 @@ package fields
 
 import (
 	rl "github.com/DankFC/raylib-goplus/raylib"
-	"github.com/Slixe/visual-go/graphics"
 	"github.com/Slixe/visual-go/structures"
 	"strings"
 )
@@ -32,7 +31,7 @@ func CreatePasswordField(text string, editable bool, maxChars int, posX float32,
 	}
 }
 
-func (field *PasswordField) Show(app structures.IApp) {
+func (field *PasswordField) Show(graphics structures.IGraphics, app structures.IApp) {
 	editable := field.Editable
 	if editable {
 		editable = field.Selected

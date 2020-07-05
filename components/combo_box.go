@@ -2,7 +2,6 @@ package components
 
 import (
 	"github.com/DankFC/raylib-goplus/raylib"
-	"github.com/Slixe/visual-go/graphics"
 	"github.com/Slixe/visual-go/structures"
 	"strings"
 )
@@ -28,7 +27,7 @@ func CreateComboBox(values []string, posX float32, posY float32, width float32, 
 	}
 }
 
-func (box *ComboBox) Show(app structures.IApp) {
+func (box *ComboBox) Show(graphics structures.IGraphics, app structures.IApp) {
 	selected := raylib.GuiComboBox(graphics.CreateRectangle(box.BaseComponent), strings.Join(box.Values, ";"), box.Active)
 	if box.Active != selected {
 		box.Active = selected

@@ -2,7 +2,6 @@ package components
 
 import (
 	"github.com/DankFC/raylib-goplus/raylib"
-	"github.com/Slixe/visual-go/graphics"
 	"github.com/Slixe/visual-go/structures"
 )
 
@@ -25,7 +24,7 @@ func CreateLabel(label string, color raylib.Color, posX float32, posY float32, w
 	}
 }
 
-func (label Label) Show(app structures.IApp) {
+func (label Label) Show(graphics structures.IGraphics, app structures.IApp) {
 	raylib.GuiLabel(graphics.CreateRectangle(label.BaseComponent), label.Label)
 }
 

@@ -4,6 +4,7 @@ import (
 	rl "github.com/DankFC/raylib-goplus/raylib"
 	"github.com/Slixe/visual-go/graphics"
 	"github.com/Slixe/visual-go/structures"
+	"github.com/kjk/flex"
 )
 
 type FadeOutTexturedPanel struct {
@@ -13,12 +14,13 @@ type FadeOutTexturedPanel struct {
 	FadeOutFactor uint8
 	FadeColor rl.Color
 	Callback func()
+	Layout *flex.Node
 	duration float32
 }
 
 func CreateFadeOutTexturedPanel(texturePath string, fadeColor rl.Color, timeBeforeFade float32, fadeOutFactor uint8, onFinished func()) *FadeOutTexturedPanel {
 	return &FadeOutTexturedPanel{
-		BackgroundTexture: rl.LoadTexture(texturePath),
+		BackgroundTexture: graphics.LoadTexture(texturePath),
 		TimeBeforeFade: timeBeforeFade,
 		FadeOutFactor:fadeOutFactor,
 		Callback: onFinished,
@@ -27,7 +29,7 @@ func CreateFadeOutTexturedPanel(texturePath string, fadeColor rl.Color, timeBefo
 	}
 }
 
-func (panel *FadeOutTexturedPanel) Show(app structures.IApp) {
+func (panel *FadeOutTexturedPanel) Show(graphics structures.IGraphics, app structures.IApp) {
 	panel.duration += rl.GetFrameTime()
 	if panel.duration >= panel.TimeBeforeFade {
 		if panel.FadeColor.A > panel.FadeOutFactor {
@@ -49,4 +51,12 @@ func (panel FadeOutTexturedPanel) GetComponents() []structures.IComponent {
 
 func (panel *FadeOutTexturedPanel) AddComponent(component structures.IComponent) {
 	panel.Components = append(panel.Components, component)
+}
+
+func (panel *FadeOutTexturedPanel) SetLayout(layout *flex.Node) {
+	panel.Layout = layout
+}
+
+func (panel FadeOutTexturedPanel) GetLayout() *flex.Node {
+	return panel.Layout
 }

@@ -1,24 +1,20 @@
 package panels
 
 import (
-	rl "github.com/DankFC/raylib-goplus/raylib"
 	"github.com/Slixe/visual-go/structures"
+	"github.com/kjk/flex"
 )
 
 type Panel struct {
-	Color      rl.Color
 	Components []structures.IComponent
+	Layout *flex.Node
 }
 
-func CreatePanel(color rl.Color) *Panel {
-	return &Panel{
-		Color: color,
-	}
+func CreatePanel() *Panel {
+	return &Panel{}
 }
 
-func (panel Panel) Show(app structures.IApp) {
-	rl.ClearBackground(panel.Color)
-}
+func (panel Panel) Show(graphics structures.IGraphics, app structures.IApp) {}
 
 func (panel Panel) GetComponents() []structures.IComponent {
 	return panel.Components
@@ -26,4 +22,12 @@ func (panel Panel) GetComponents() []structures.IComponent {
 
 func (panel *Panel) AddComponent(component structures.IComponent) {
 	panel.Components = append(panel.Components, component)
+}
+
+func (panel *Panel) SetLayout(layout *flex.Node) {
+	panel.Layout = layout
+}
+
+func (panel Panel) GetLayout() *flex.Node {
+	return panel.Layout
 }

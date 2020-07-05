@@ -2,7 +2,6 @@ package components
 
 import (
 	"github.com/DankFC/raylib-goplus/raylib"
-	"github.com/Slixe/visual-go/graphics"
 	"github.com/Slixe/visual-go/structures"
 )
 
@@ -27,7 +26,7 @@ func CreateCheckBox(label string, checked bool, posX float32, posY float32, widt
 	}
 }
 
-func (checkBox *CheckBox) Show(app structures.IApp) {
+func (checkBox *CheckBox) Show(graphics structures.IGraphics, app structures.IApp) {
 	c := raylib.GuiCheckBox(graphics.CreateRectangle(checkBox.BaseComponent), checkBox.Label, checkBox.Checked)
 	if c != checkBox.Checked {
 		checkBox.Checked = c
