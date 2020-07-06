@@ -7,13 +7,13 @@ import (
 
 type ValueField struct {
 	structures.BaseComponent
+	structures.BaseSelectableComponent
 	Editable      bool
 	Text 		string
 	Value          int
 	MinValue int
 	MaxValue int
 	Callback      func(text ValueField)
-	Selected bool
 }
 
 func CreateValueField(text string, value int, minValue int, maxValue int, editable bool, posX float32, posY float32, width float32, height float32, onTextChanged func(text ValueField)) *ValueField {
@@ -30,7 +30,6 @@ func CreateValueField(text string, value int, minValue int, maxValue int, editab
 		MaxValue: maxValue,
 		Editable:      editable,
 		Callback:      onTextChanged,
-		Selected: false,
 	}
 }
 
@@ -51,16 +50,4 @@ func (field *ValueField) Show(graphics structures.IGraphics, app structures.IApp
 		field.Callback(*field)
 	}
 	field.Value = val
-}
-
-func (field ValueField) GetBaseComponent() structures.BaseComponent {
-	return field.BaseComponent
-}
-
-func (field ValueField) IsSelected() bool {
-	return field.Selected
-}
-
-func (field *ValueField) SetSelected(value bool) {
-	field.Selected = value
 }

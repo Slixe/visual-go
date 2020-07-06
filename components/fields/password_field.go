@@ -8,11 +8,11 @@ import (
 
 type PasswordField struct {
 	structures.BaseComponent
+	structures.BaseSelectableComponent
 	Editable      bool
 	Text          string
 	MaxCharacters int
 	Callback      func(password PasswordField)
-	Selected bool
 }
 
 func CreatePasswordField(text string, editable bool, maxChars int, posX float32, posY float32, width float32, height float32, onTextChanged func(password PasswordField)) *PasswordField {
@@ -27,7 +27,6 @@ func CreatePasswordField(text string, editable bool, maxChars int, posX float32,
 		Editable:      editable,
 		MaxCharacters: maxChars,
 		Callback:      onTextChanged,
-		Selected: false,
 	}
 }
 
@@ -48,16 +47,4 @@ func (field *PasswordField) Show(graphics structures.IGraphics, app structures.I
 
 		field.Callback(*field)
 	}
-}
-
-func (field PasswordField) GetBaseComponent() structures.BaseComponent {
-	return field.BaseComponent
-}
-
-func (field PasswordField) IsSelected() bool {
-	return field.Selected
-}
-
-func (field *PasswordField) SetSelected(value bool) {
-	field.Selected = value
 }

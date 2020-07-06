@@ -39,11 +39,39 @@ func (g Graphics) DrawText(font rl.Font, text string, posX float32, posY float32
 }
 
 func (g Graphics) DrawLine(startX int, startY int, endX int, endY int, color rl.Color) {
+	if startX + endX > int(g.maxWidth) {
+		endX = int(g.maxWidth) - startX
+	}
+
+	if startY + endY > int(g.maxHeight) {
+		endY = int(g.maxHeight) - startY
+	}
+
 	rl.DrawLine(int(g.posX) + startX, int(g.posY) + startY, endX, endY, color)
 }
 
 func (g Graphics) CreateRectangle(component structures.BaseComponent) rl.Rectangle {
+	if component.PosX + component.Width > g.maxWidth {
+		component.Width = g.maxWidth - component.PosX
+	}
+
+	if component.PosY + component.Height > g.maxHeight {
+		component.Height = g.maxHeight - component.PosY
+	}
+
 	return rl.NewRectangle(g.posX + component.PosX, g.posY + component.PosY, component.Width, component.Height)
+}
+
+func (g Graphics) DrawRectangle(posX int, posY int, width int, height int, color rl.Color) {
+	if posX + width > int(g.maxWidth) {
+		width = int(g.maxWidth) - posX
+	}
+
+	if posY + height > int(g.maxHeight) {
+		height = int(g.maxHeight) - posY
+	}
+
+	rl.DrawRectangle(int(g.posX) + posX, int(g.posY) + posY, width, height, color)
 }
 
 func (g Graphics) GetWidth() float32 {
@@ -52,4 +80,12 @@ func (g Graphics) GetWidth() float32 {
 
 func (g Graphics) GetHeight() float32 {
 	return g.maxHeight
+}
+
+func (g Graphics) GetPosX() float32 {
+	return g.posX
+}
+
+func (g Graphics) GetPosY() float32 {
+	return g.posY
 }

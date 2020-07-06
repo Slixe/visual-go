@@ -46,8 +46,11 @@ type IGraphics interface {
 	DrawText(font rl.Font, text string, posX float32, posY float32, fontSize float32, spacing float32, color rl.Color)
 	DrawLine(startX int, startY int, endX int, endY int, color rl.Color)
 	CreateRectangle(component BaseComponent) rl.Rectangle
+	DrawRectangle(posX int, posY int, width int, height int, color rl.Color)
 	GetWidth() float32
 	GetHeight() float32
+	GetPosX() float32
+	GetPosY() float32
 }
 
 type IComponent interface {
@@ -61,9 +64,18 @@ type ISelectableComponent interface {
 	IsSelected() bool
 }
 
+type BasePanel struct {
+	Layout *flex.Node
+	Components []IComponent
+}
+
 type BaseComponent struct {
 	PosX   float32
 	PosY   float32
 	Width  float32
 	Height float32
+}
+
+type BaseSelectableComponent struct {
+	Selected bool
 }

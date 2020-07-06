@@ -36,7 +36,3 @@ func (btn TexturedButton) Show(graphics structures.IGraphics, app structures.IAp
 		btn.Callback(btn)
 	}
 }
-
-func (btn TexturedButton) GetBaseComponent() structures.BaseComponent {
-	return btn.BaseComponent
-}

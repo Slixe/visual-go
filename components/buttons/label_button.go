@@ -23,12 +23,9 @@ func CreateLabelButton(label string, posX float32, posY float32, width float32, 
 		Callback: callback,
 	}
 }
+
 func (btn LabelButton) Show(graphics structures.IGraphics, app structures.IApp) {
 	if rl.GuiLabelButton(graphics.CreateRectangle(btn.BaseComponent), btn.Label) {
 		btn.Callback(btn)
 	}
-}
-
-func (btn LabelButton) GetBaseComponent() structures.BaseComponent {
-	return btn.BaseComponent
 }

@@ -7,11 +7,11 @@ import (
 
 type TextField struct {
 	structures.BaseComponent
+	structures.BaseSelectableComponent
 	Editable      bool
 	Text          string
 	MaxCharacters int
 	Callback      func(text TextField)
-	Selected bool
 }
 
 func CreateTextField(text string, editable bool, maxChars int, posX float32, posY float32, width float32, height float32, onTextChanged func(text TextField)) *TextField {
@@ -26,7 +26,6 @@ func CreateTextField(text string, editable bool, maxChars int, posX float32, pos
 		Editable:      editable,
 		MaxCharacters: maxChars,
 		Callback:      onTextChanged,
-		Selected: false,
 	}
 }
 
@@ -42,16 +41,4 @@ func (field *TextField) Show(graphics structures.IGraphics, app structures.IApp)
 		field.Callback(*field)
 	}
 	field.Text = str
-}
-
-func (field TextField) GetBaseComponent() structures.BaseComponent {
-	return field.BaseComponent
-}
-
-func (field TextField) IsSelected() bool {
-	return field.Selected
-}
-
-func (field *TextField) SetSelected(value bool) {
-	field.Selected = value
 }

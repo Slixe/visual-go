@@ -36,7 +36,3 @@ func (box *ComboBox) Show(graphics structures.IGraphics, app structures.IApp) {
 		box.Active = selected
 	}
 }
-
-func (box ComboBox) GetBaseComponent() structures.BaseComponent {
-	return box.BaseComponent
-}

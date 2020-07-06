@@ -35,7 +35,3 @@ func (checkBox *CheckBox) Show(graphics structures.IGraphics, app structures.IAp
 		checkBox.Checked = c
 	}
 }
-
-func (checkBox CheckBox) GetBaseComponent() structures.BaseComponent {
-	return checkBox.BaseComponent
-}

@@ -4,17 +4,15 @@ import (
 	rl "github.com/DankFC/raylib-goplus/raylib"
 	"github.com/Slixe/visual-go/graphics"
 	"github.com/Slixe/visual-go/structures"
-	"github.com/kjk/flex"
 )
 
 type FadeInTexturedPanel struct {
 	BackgroundTexture rl.Texture2D
-	Components        []structures.IComponent
+	structures.BasePanel
 	TimeBeforeFade float32
 	FadeOutFactor uint8
 	FadeColor rl.Color
 	Callback func()
-	Layout *flex.Node
 	duration float32
 }
 
@@ -45,20 +43,4 @@ func (panel *FadeInTexturedPanel) Show(graphics structures.IGraphics, app struct
 	if panel.FadeColor.A == 255 {
 		panel.Callback()
 	}
-}
-
-func (panel FadeInTexturedPanel) GetComponents() []structures.IComponent {
-	return panel.Components
-}
-
-func (panel *FadeInTexturedPanel) AddComponent(component structures.IComponent) {
-	panel.Components = append(panel.Components, component)
-}
-
-func (panel *FadeInTexturedPanel) SetLayout(layout *flex.Node) {
-	panel.Layout = layout
-}
-
-func (panel FadeInTexturedPanel) GetLayout() *flex.Node {
-	return panel.Layout
 }

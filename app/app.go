@@ -46,7 +46,7 @@ func (app *App) Render() {
 	app.CalculateLayout()
 	globalLayout := graphics.CreateGraphics(*app.Flex.RootNode)
 	for !rl.WindowShouldClose() {
-		var selectables []structures.ISelectableComponent
+		var selectables = make(map[graphics.Graphics][]structures.ISelectableComponent)
 		var components = make(map[graphics.Graphics][]structures.IComponent)
 
 		g := globalLayout
@@ -84,7 +84,10 @@ func (app *App) Render() {
 		for graph, comps := range components {
 			for _, component := range comps {
 				if selectable, ok := component.(structures.ISelectableComponent); ok {
-					selectables = append(selectables, selectable)
+					selectables[graph] = append(selectables[graph], selectable)
+					if currentSelected == nil && selectable.IsSelected() {
+						currentSelected = selectable
+					}
 				}
 
 				component.Show(graph, app)
@@ -92,17 +95,25 @@ func (app *App) Render() {
 		}
 
 		if len(selectables) > 0 && currentSelected == nil {
-			selectables[0].SetSelected(true) //we select first by default
-			currentSelected = selectables[0]
+			for _, values := range selectables {
+				for _, selectable := range values {
+					currentSelected = selectable
+					currentSelected.SetSelected(true)
+					break
+				}
+				break
+			}
 		}
 
 		mousePos := rl.GetMousePosition()
-		for _, selectable := range selectables {
-			base := selectable.GetBaseComponent()
-			if rl.IsMouseButtonPressed(rl.MouseLeftButton) && base.PosX <= mousePos.X && base.PosX + base.Width >= mousePos.X && base.PosY <= mousePos.Y && base.PosY + base.Height >= mousePos.Y {
-				currentSelected.SetSelected(false)
-				selectable.SetSelected(true)
-				currentSelected = selectable
+		for graph, values := range selectables {
+			for _, selectable := range values {
+				base := selectable.GetBaseComponent()
+				if rl.IsMouseButtonPressed(rl.MouseLeftButton) && graph.GetPosX() + base.PosX <= mousePos.X && graph.GetPosX() + base.PosX + base.Width >= mousePos.X && graph.GetPosY() + base.PosY <= mousePos.Y && graph.GetPosY() + base.PosY + base.Height >= mousePos.Y {
+					currentSelected.SetSelected(false)
+					selectable.SetSelected(true)
+					currentSelected = selectable
+				}
 			}
 		}
 		rl.EndDrawing()
