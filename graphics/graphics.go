@@ -18,11 +18,11 @@ func (g Graphics) DrawTexture(texture rl.Texture2D, posX float32, posY float32, 
 
 func (g Graphics) DrawTexturePro(texture rl.Texture2D, posX float32, posY float32, width float32, height float32, rotation float32, color rl.Color) {
 	if posX + width > g.maxWidth {
-		width = g.maxWidth - posX
+		posX = g.maxWidth - width
 	}
 
 	if posY + height > g.maxHeight {
-		height = g.maxHeight - posY
+		posY = g.maxHeight - height
 	}
 
 	rect := rl.Rectangle{Y: 0, X: 0, Width: float32(texture.Width), Height: float32(texture.Height)}
@@ -39,24 +39,41 @@ func (g Graphics) DrawText(font rl.Font, text string, posX float32, posY float32
 }
 
 func (g Graphics) DrawLine(startX int, startY int, endX int, endY int, color rl.Color) {
-	if startX + endX > int(g.maxWidth) {
-		endX = int(g.maxWidth) - startX
+	if endX > int(g.maxWidth) {
+		endX = int(g.maxWidth)
 	}
 
-	if startY + endY > int(g.maxHeight) {
-		endY = int(g.maxHeight) - startY
+	if endY > int(g.maxHeight) {
+		endY = int(g.maxHeight)
 	}
 
-	rl.DrawLine(int(g.posX) + startX, int(g.posY) + startY, endX, endY, color)
+	if startX > int(g.maxWidth) {
+		startX = int(g.maxWidth)
+	}
+
+	if startY > int(g.maxHeight) {
+		startY = int(g.maxHeight)
+	}
+
+	rl.DrawLine(int(g.posX) + startX, int(g.posY) + startY, int(g.posX) + endX, int(g.posY) + endY, color)
 }
 
-func (g Graphics) CreateRectangle(component structures.BaseComponent) rl.Rectangle {
+func (g Graphics) CreateRectangle(component structures.ComponentPos) rl.Rectangle {
+
+	if component.PosX < 0 {
+		component.PosX += g.maxWidth
+	}
+
+	if component.PosY < 0 {
+		component.PosY += g.maxHeight
+	}
+
 	if component.PosX + component.Width > g.maxWidth {
-		component.Width = g.maxWidth - component.PosX
+		component.PosX = g.maxWidth - component.Width
 	}
 
 	if component.PosY + component.Height > g.maxHeight {
-		component.Height = g.maxHeight - component.PosY
+		component.PosY = g.maxHeight - component.Height
 	}
 
 	return rl.NewRectangle(g.posX + component.PosX, g.posY + component.PosY, component.Width, component.Height)

@@ -11,13 +11,10 @@ type Label struct {
 	Color raylib.Color
 }
 
-func CreateLabel(label string, color raylib.Color, posX float32, posY float32, width float32, height float32) *Label {
+func CreateLabel(label string, color raylib.Color, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos) *Label {
 	return &Label{
 		BaseComponent: structures.BaseComponent{
-			PosX:   posX,
-			PosY:   posY,
-			Width:  width,
-			Height: height,
+			Func: posFunc,
 		},
 		Label: label,
 		Color: color,
@@ -25,5 +22,5 @@ func CreateLabel(label string, color raylib.Color, posX float32, posY float32, w
 }
 
 func (label Label) Show(graphics structures.IGraphics, app structures.IApp) {
-	raylib.GuiLabel(graphics.CreateRectangle(label.BaseComponent), label.Label)
+	raylib.GuiLabel(graphics.CreateRectangle(label.GetPosition()), label.Label)
 }

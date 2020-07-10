@@ -13,6 +13,11 @@ type Flex struct {
 	Direction flex.Direction
 }
 
+type panelInfo struct {
+	layoutName string
+	graphics   structures.IGraphics
+}
+
 type App struct {
 	Title        string
 	Width        int
@@ -22,12 +27,14 @@ type App struct {
 	Flex         Flex
 	font         *rl.Font
 	globalPanel  structures.IPanel
-	panels 		 map[string]structures.IPanel
+	layouts 	 map[string]*flex.Node
+	panels 		 map[structures.IPanel]panelInfo
 	components   []structures.IComponent //globals components
 }
 
 func (app *App) Start() {
-	app.panels = make(map[string]structures.IPanel)
+	app.layouts = make(map[string]*flex.Node)
+	app.panels = make(map[structures.IPanel]panelInfo)
 
 	if app.Resizable {
 		rl.SetConfigFlags(rl.FlagWindowResizable)
@@ -46,10 +53,8 @@ func (app *App) Render() {
 	app.CalculateLayout()
 	globalLayout := graphics.CreateGraphics(*app.Flex.RootNode)
 	for !rl.WindowShouldClose() {
-		var selectables = make(map[graphics.Graphics][]structures.ISelectableComponent)
-		var components = make(map[graphics.Graphics][]structures.IComponent)
-
-		g := globalLayout
+		var selectables = make(map[structures.IGraphics][]structures.ISelectableComponent)
+		var components = make(map[structures.IGraphics][]structures.IComponent)
 
 		rl.BeginDrawing()
 		rl.ClearBackground(app.DefaultColor)
@@ -64,19 +69,12 @@ func (app *App) Render() {
 
 		if app.globalPanel != nil {
 			app.globalPanel.Show(globalLayout, app)
-			components[g] = append(components[g], app.globalPanel.GetComponents()...)
+			components[globalLayout] = append(components[globalLayout], app.globalPanel.GetComponents()...)
 		}
 
-		for _, panel := range app.panels {
-			if panel.GetLayout() != nil {
-				g = graphics.CreateGraphics(*panel.GetLayout())
-			} else {
-				g = globalLayout
-			}
-
-			panel.Show(g, app)
-
-			components[g] = append(components[g], panel.GetComponents()...)
+		for panel, g := range app.panels {
+			panel.Show(g.graphics, app)
+			components[g.graphics] = append(components[g.graphics], panel.GetComponents()...)
 		}
 
 		globalComponents := app.GetGlobalComponents()
@@ -108,8 +106,8 @@ func (app *App) Render() {
 		mousePos := rl.GetMousePosition()
 		for graph, values := range selectables {
 			for _, selectable := range values {
-				base := selectable.GetBaseComponent()
-				if rl.IsMouseButtonPressed(rl.MouseLeftButton) && graph.GetPosX() + base.PosX <= mousePos.X && graph.GetPosX() + base.PosX + base.Width >= mousePos.X && graph.GetPosY() + base.PosY <= mousePos.Y && graph.GetPosY() + base.PosY + base.Height >= mousePos.Y {
+				pos := selectable.GetPosition()
+				if rl.IsMouseButtonPressed(rl.MouseLeftButton) && graph.GetPosX() + pos.PosX <= mousePos.X && graph.GetPosX() + pos.PosX + pos.Width >= mousePos.X && graph.GetPosY() + pos.PosY <= mousePos.Y && graph.GetPosY() + pos.PosY + pos.Height >= mousePos.Y {
 					currentSelected.SetSelected(false)
 					selectable.SetSelected(true)
 					currentSelected = selectable
@@ -126,9 +124,19 @@ func (app App) Close() {
 	rl.CloseWindow()
 }
 
-func (app App) CalculateLayout() {
+func (app *App) CalculateLayout() {
 	if app.Flex.RootNode != nil {
 		flex.CalculateLayout(app.Flex.RootNode, float32(app.GetWidth()), float32(app.GetHeight()), app.Flex.Direction)
+	}
+
+	for panel, info := range app.panels {
+		graph := graphics.CreateGraphics(*app.layouts[info.layoutName])
+		info.graphics = graph
+		app.panels[panel] = info
+
+		for _, comp := range panel.GetComponents() {
+			comp.UpdatePosition(graph, app)
+		}
 	}
 }
 
@@ -161,33 +169,54 @@ func (app App) GetMinHeight() int {
 	return app.Height
 }
 
-func (app *App) SetPanel(name string, panel structures.IPanel) {
-	app.panels[name] = panel
-}
+func (app *App) SetPanel(layoutName string, panel structures.IPanel) bool {
 
-func (app *App) RemovePanel(name string) {
-	_, ok := app.panels[name]
-	if ok {
-		delete(app.panels, name)
+	if _, ok := app.layouts[layoutName]; !ok {
+		return false
 	}
+
+	app.panels[panel] = panelInfo{
+		layoutName: layoutName,
+		graphics:   graphics.CreateGraphics(*app.layouts[layoutName]),
+	}
+
+	app.CalculateLayout()
+
+	return true
 }
 
-func (app App) GetPanel(name string) structures.IPanel {
-	return app.panels[name]
+func (app *App) RemovePanel(panel structures.IPanel) {
+	_, ok := app.panels[panel]
+	if ok {
+		delete(app.panels, panel)
+	}
 }
 
 func (app App) GetPanels() []structures.IPanel {
 	panels := make([]structures.IPanel, len(app.panels))
 	i := 0
-	for _, v := range app.panels {
-		panels[i] = v
+	for p := range app.panels {
+		panels[i] = p
 		i++
 	}
 	return panels
 }
 
 func (app *App) ClearPanels() {
-	app.panels = make(map[string]structures.IPanel)
+	app.panels = make(map[structures.IPanel]panelInfo)
+}
+
+func (app *App) RegisterLayout(layoutName string, node *flex.Node) {
+	app.layouts[layoutName] = node
+}
+
+func (app *App) RemoveLayout(layoutName string) *flex.Node {
+	v, ok := app.layouts[layoutName]
+	if ok {
+		delete(app.layouts, layoutName)
+	}
+
+	return v
 }
 
 func (app *App) ClearGlobalComponents() {

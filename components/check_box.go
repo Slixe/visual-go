@@ -12,13 +12,10 @@ type CheckBox struct {
 	Callback func(box CheckBox)
 }
 
-func CreateCheckBox(label string, checked bool, posX float32, posY float32, width float32, height float32, callback func(box CheckBox)) *CheckBox {
+func CreateCheckBox(label string, checked bool, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, callback func(box CheckBox)) *CheckBox {
 	return &CheckBox{
 		BaseComponent: structures.BaseComponent{
-			PosX:   posX,
-			PosY:   posY,
-			Width:  width,
-			Height: height,
+			Func: posFunc,
 		},
 		Label:    label,
 		Checked:  checked,
@@ -27,7 +24,7 @@ func CreateCheckBox(label string, checked bool, posX float32, posY float32, widt
 }
 
 func (checkBox *CheckBox) Show(graphics structures.IGraphics, app structures.IApp) {
-	c := raylib.GuiCheckBox(graphics.CreateRectangle(checkBox.BaseComponent), checkBox.Label, checkBox.Checked)
+	c := raylib.GuiCheckBox(graphics.CreateRectangle(checkBox.GetPosition()), checkBox.Label, checkBox.Checked)
 	if c != checkBox.Checked {
 		checkBox.Checked = c
 		checkBox.Callback(*checkBox)

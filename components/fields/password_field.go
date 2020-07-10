@@ -7,7 +7,6 @@ import (
 )
 
 type PasswordField struct {
-	structures.BaseComponent
 	structures.BaseSelectableComponent
 	Editable      bool
 	Text          string
@@ -15,13 +14,13 @@ type PasswordField struct {
 	Callback      func(password PasswordField)
 }
 
-func CreatePasswordField(text string, editable bool, maxChars int, posX float32, posY float32, width float32, height float32, onTextChanged func(password PasswordField)) *PasswordField {
+func CreatePasswordField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, onTextChanged func(password PasswordField)) *PasswordField {
 	return &PasswordField{
-		BaseComponent: structures.BaseComponent{
-			PosX:   posX,
-			PosY:   posY,
-			Width:  width,
-			Height: height,
+		BaseSelectableComponent: structures.BaseSelectableComponent{
+			BaseComponent: structures.BaseComponent{
+				Func: posFunc,
+			},
+			Selected: false,
 		},
 		Text:          text,
 		Editable:      editable,
@@ -36,7 +35,7 @@ func (field *PasswordField) Show(graphics structures.IGraphics, app structures.I
 		editable = field.Selected
 	}
 
-	_, str := rl.GuiTextBox(graphics.CreateRectangle(field.BaseComponent), strings.Repeat("*", len(field.Text)), field.MaxCharacters, editable)
+	_, str := rl.GuiTextBox(graphics.CreateRectangle(field.GetPosition()), strings.Repeat("*", len(field.Text)), field.MaxCharacters, editable)
 
 	if len(field.Text) != len(str) {
 		if len(str) < len(field.Text) && len(field.Text) > 0 {

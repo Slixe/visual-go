@@ -6,7 +6,6 @@ import (
 )
 
 type ValueField struct {
-	structures.BaseComponent
 	structures.BaseSelectableComponent
 	Editable      bool
 	Text 		string
@@ -16,20 +15,20 @@ type ValueField struct {
 	Callback      func(text ValueField)
 }
 
-func CreateValueField(text string, value int, minValue int, maxValue int, editable bool, posX float32, posY float32, width float32, height float32, onTextChanged func(text ValueField)) *ValueField {
+func CreateValueField(text string, value int, minValue int, maxValue int, editable bool, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, onTextChanged func(text ValueField)) *ValueField {
 	return &ValueField{
-		BaseComponent: structures.BaseComponent{
-			PosX:   posX,
-			PosY:   posY,
-			Width:  width,
-			Height: height,
+		BaseSelectableComponent: structures.BaseSelectableComponent{
+			BaseComponent: structures.BaseComponent{
+				Func: posFunc,
+			},
+			Selected:      false,
 		},
 		Text: text,
-		Value:          value,
+		Value:	value,
 		MinValue: minValue,
 		MaxValue: maxValue,
-		Editable:      editable,
-		Callback:      onTextChanged,
+		Editable: editable,
+		Callback: onTextChanged,
 	}
 }
 
@@ -38,7 +37,7 @@ func (field *ValueField) Show(graphics structures.IGraphics, app structures.IApp
 	if editable {
 		editable = field.Selected
 	}
-	_, val := rl.GuiValueBox(graphics.CreateRectangle(field.BaseComponent), field.Text, field.Value, field.MinValue, field.MaxValue, editable) //min & max not working
+	_, val := rl.GuiValueBox(graphics.CreateRectangle(field.GetPosition()), field.Text, field.Value, field.MinValue, field.MaxValue, editable) //min & max not working
 
 	if val > field.MaxValue {
 		val = field.MaxValue

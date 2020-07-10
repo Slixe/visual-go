@@ -13,13 +13,10 @@ type ComboBox struct {
 	Callback func(box ComboBox)
 }
 
-func CreateComboBox(values []string, posX float32, posY float32, width float32, height float32, callback func(box ComboBox)) *ComboBox {
+func CreateComboBox(values []string, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, callback func(box ComboBox)) *ComboBox {
 	return &ComboBox{
 		BaseComponent: structures.BaseComponent{
-			PosX:   posX,
-			PosY:   posY,
-			Width:  width,
-			Height: height,
+			Func: posFunc,
 		},
 		Values: values,
 		Active: 0,
@@ -28,7 +25,7 @@ func CreateComboBox(values []string, posX float32, posY float32, width float32, 
 }
 
 func (box *ComboBox) Show(graphics structures.IGraphics, app structures.IApp) {
-	selected := raylib.GuiComboBox(graphics.CreateRectangle(box.BaseComponent), strings.Join(box.Values, ";"), box.Active)
+	selected := raylib.GuiComboBox(graphics.CreateRectangle(box.GetPosition()), strings.Join(box.Values, ";"), box.Active)
 	if box.Active != selected {
 		box.Active = selected
 		box.Callback(*box)

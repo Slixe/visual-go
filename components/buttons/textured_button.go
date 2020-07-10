@@ -13,26 +13,19 @@ type TexturedButton struct {
 	Callback func(btn TexturedButton)
 }
 
-func LoadAndCreateTexturedButton(label string, texturePath string, posX float32, posY float32, width float32, height float32, callback func(btn TexturedButton)) *TexturedButton {
-	return CreateTexturedButton(label, graphics.LoadTexture(texturePath), posX, posY, width, height, callback)
-}
-
-func CreateTexturedButton(label string, texture rl.Texture2D, posX float32, posY float32, width float32, height float32, callback func(btn TexturedButton)) *TexturedButton {
+func CreateTexturedButton(label string, texturePath string, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, callback func(btn TexturedButton)) *TexturedButton {
 	return &TexturedButton{
 		BaseComponent: structures.BaseComponent{
-			PosX:   posX,
-			PosY:   posY,
-			Width:  width,
-			Height: height,
+			Func: posFunc,
 		},
 		Label:    label,
-		Texture:  texture,
+		Texture:  graphics.LoadTexture(texturePath),
 		Callback: callback,
 	}
 }
 
 func (btn TexturedButton) Show(graphics structures.IGraphics, app structures.IApp) {
-	if rl.GuiImageButton(graphics.CreateRectangle(btn.BaseComponent), btn.Label, btn.Texture) {
+	if rl.GuiImageButton(graphics.CreateRectangle(btn.GetPosition()), btn.Label, btn.Texture) {
 		btn.Callback(btn)
 	}
 }

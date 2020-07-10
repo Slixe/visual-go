@@ -2,13 +2,14 @@ package graphics
 
 import (
 	rl "github.com/DankFC/raylib-goplus/raylib"
+	"github.com/Slixe/visual-go/structures"
 	"github.com/kjk/flex"
 )
 
 var textures = map[string]rl.Texture2D{}
 var fonts = map[string]*rl.Font{}
 
-func CreateGraphics(node flex.Node) Graphics {
+func CreateGraphics(node flex.Node) structures.IGraphics {
 	return Graphics{
 		posX: node.LayoutGetLeft(),
 		posY: node.LayoutGetTop(),
@@ -24,6 +25,10 @@ func LoadFont(fontPath string, fontSize int) *rl.Font {
 		fonts[fontPath] = font
 	}
 
+	if font.BaseSize != int32(fontSize) {
+		return rl.LoadFontEx(fontPath, fontSize, nil, 256)
+	}
+
 	return font
 }
 
@@ -35,4 +40,19 @@ func LoadTexture(texturePath string) rl.Texture2D {
 	}
 
 	return texture
+}
+
+func AbsPos(posX float32, posY float32, width float32, height float32) func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos {
+	return func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos {
+		return Position(posX, posY, width, height)
+	}
+}
+
+func Position(posX float32, posY float32, width float32, height float32) structures.ComponentPos {
+	return structures.ComponentPos{
+		PosX:   posX,
+		PosY:   posY,
+		Width:  width,
+		Height: height,
+	}
 }

@@ -6,7 +6,6 @@ import (
 )
 
 type TextField struct {
-	structures.BaseComponent
 	structures.BaseSelectableComponent
 	Editable      bool
 	Text          string
@@ -14,13 +13,13 @@ type TextField struct {
 	Callback      func(text TextField)
 }
 
-func CreateTextField(text string, editable bool, maxChars int, posX float32, posY float32, width float32, height float32, onTextChanged func(text TextField)) *TextField {
+func CreateTextField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, onTextChanged func(text TextField)) *TextField {
 	return &TextField{
-		BaseComponent: structures.BaseComponent{
-			PosX:   posX,
-			PosY:   posY,
-			Width:  width,
-			Height: height,
+		BaseSelectableComponent: structures.BaseSelectableComponent{
+			BaseComponent: structures.BaseComponent{
+				Func: posFunc,
+			},
+			Selected: false,
 		},
 		Text:          text,
 		Editable:      editable,
@@ -35,7 +34,7 @@ func (field *TextField) Show(graphics structures.IGraphics, app structures.IApp)
 		editable = field.Selected
 	}
 
-	_, str := rl.GuiTextBox(graphics.CreateRectangle(field.BaseComponent), field.Text, field.MaxCharacters, editable)
+	_, str := rl.GuiTextBox(graphics.CreateRectangle(field.GetPosition()), field.Text, field.MaxCharacters, editable)
 
 	if field.Text != str {
 		field.Callback(*field)

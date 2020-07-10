@@ -13,11 +13,12 @@ type IApp interface {
 	SetGlobalPanel(panel IPanel)
 	GetWidth() int
 	GetHeight() int
-	SetPanel(name string, panel IPanel)
-	RemovePanel(name string)
-	GetPanel(name string) IPanel
+	SetPanel(layoutName string, panel IPanel) bool
+	RemovePanel(panel IPanel)
 	GetPanels() []IPanel
 	ClearPanels()
+	RegisterLayout(layoutName string, node *flex.Node)
+	RemoveLayout(layoutName string) *flex.Node
 	AddGlobalComponent(component IComponent)
 	GetGlobalComponents() []IComponent
 	ClearGlobalComponents()
@@ -33,8 +34,6 @@ type IShow interface {
 
 type IPanel interface {
 	IShow
-	SetLayout(layout *flex.Node)
-	GetLayout() *flex.Node
 	GetComponents() []IComponent
 	AddComponent(component IComponent)
 }
@@ -45,7 +44,7 @@ type IGraphics interface {
 	DrawTextDefaultFont(text string, posX int, posY int, fontSize int, color rl.Color)
 	DrawText(font rl.Font, text string, posX float32, posY float32, fontSize float32, spacing float32, color rl.Color)
 	DrawLine(startX int, startY int, endX int, endY int, color rl.Color)
-	CreateRectangle(component BaseComponent) rl.Rectangle
+	CreateRectangle(component ComponentPos) rl.Rectangle
 	DrawRectangle(posX int, posY int, width int, height int, color rl.Color)
 	GetWidth() float32
 	GetHeight() float32
@@ -55,7 +54,8 @@ type IGraphics interface {
 
 type IComponent interface {
 	IShow
-	GetBaseComponent() BaseComponent
+	GetPosition() ComponentPos
+	UpdatePosition(graphics IGraphics, app IApp)
 }
 
 type ISelectableComponent interface {
@@ -65,11 +65,15 @@ type ISelectableComponent interface {
 }
 
 type BasePanel struct {
-	Layout *flex.Node
 	Components []IComponent
 }
 
 type BaseComponent struct {
+	Func func(graphics IGraphics, app IApp) ComponentPos
+	cachePos ComponentPos
+}
+
+type ComponentPos struct {
 	PosX   float32
 	PosY   float32
 	Width  float32
@@ -77,5 +81,6 @@ type BaseComponent struct {
 }
 
 type BaseSelectableComponent struct {
+	BaseComponent
 	Selected bool
 }

@@ -11,13 +11,10 @@ type LabelButton struct {
 	Callback func(label LabelButton)
 }
 
-func CreateLabelButton(label string, posX float32, posY float32, width float32, height float32, callback func(label LabelButton)) *LabelButton {
+func CreateLabelButton(label string, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, callback func(label LabelButton)) *LabelButton {
 	return &LabelButton{
 		BaseComponent: structures.BaseComponent{
-			PosX:   posX,
-			PosY:   posY,
-			Width:  width,
-			Height: height,
+			Func: posFunc,
 		},
 		Label:    label,
 		Callback: callback,
@@ -25,7 +22,7 @@ func CreateLabelButton(label string, posX float32, posY float32, width float32, 
 }
 
 func (btn LabelButton) Show(graphics structures.IGraphics, app structures.IApp) {
-	if rl.GuiLabelButton(graphics.CreateRectangle(btn.BaseComponent), btn.Label) {
+	if rl.GuiLabelButton(graphics.CreateRectangle(btn.GetPosition()), btn.Label) {
 		btn.Callback(btn)
 	}
 }
