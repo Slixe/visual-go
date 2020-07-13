@@ -6,25 +6,23 @@ import (
 )
 
 type TextField struct {
-	structures.BaseSelectableComponent
-	Editable      bool
-	Text          string
-	MaxCharacters int
-	Callback      func(text TextField)
+	structures.BaseInputField
 }
 
-func CreateTextField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, onTextChanged func(text TextField)) *TextField {
+func CreateTextField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, onTextChanged func(text structures.IInputField)) *TextField {
 	return &TextField{
-		BaseSelectableComponent: structures.BaseSelectableComponent{
-			BaseComponent: structures.BaseComponent{
-				Func: posFunc,
+		BaseInputField: structures.BaseInputField{
+			BaseSelectableComponent: structures.BaseSelectableComponent{
+				BaseComponent: structures.BaseComponent{
+					Func: posFunc,
+				},
+				Selected: false,
 			},
-			Selected: false,
+			Text:          text,
+			Editable:      editable,
+			MaxCharacters: maxChars,
+			Callback:      onTextChanged,
 		},
-		Text:          text,
-		Editable:      editable,
-		MaxCharacters: maxChars,
-		Callback:      onTextChanged,
 	}
 }
 
@@ -37,7 +35,7 @@ func (field *TextField) Show(graphics structures.IGraphics, app structures.IApp)
 	_, str := rl.GuiTextBox(graphics.CreateRectangle(field.GetPosition()), field.Text, field.MaxCharacters, editable)
 
 	if field.Text != str {
-		field.Callback(*field)
+		field.Callback(field)
 	}
 	field.Text = str
 }

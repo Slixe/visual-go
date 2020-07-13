@@ -54,6 +54,7 @@ func (app *App) Render() {
 	globalLayout := graphics.CreateGraphics(*app.Flex.RootNode)
 	for !rl.WindowShouldClose() {
 		var selectables = make(map[structures.IGraphics][]structures.ISelectableComponent)
+		var clickables = make(map[structures.IGraphics][]structures.IClickable)
 		var components = make(map[structures.IGraphics][]structures.IComponent)
 
 		rl.BeginDrawing()
@@ -86,6 +87,8 @@ func (app *App) Render() {
 					if currentSelected == nil && selectable.IsSelected() {
 						currentSelected = selectable
 					}
+				} else if clickable, ok := component.(structures.IClickable); ok {
+					clickables[graph] = append(clickables[graph], clickable)
 				}
 
 				component.Show(graph, app)
@@ -111,6 +114,15 @@ func (app *App) Render() {
 					currentSelected.SetSelected(false)
 					selectable.SetSelected(true)
 					currentSelected = selectable
+				}
+			}
+		}
+
+		for graph, values := range clickables {
+			for _, clickable := range values {
+				pos := clickable.GetPosition()
+				if rl.IsMouseButtonPressed(rl.MouseLeftButton) && graph.GetPosX() + pos.PosX <= mousePos.X && graph.GetPosX() + pos.PosX + pos.Width >= mousePos.X && graph.GetPosY() + pos.PosY <= mousePos.Y && graph.GetPosY() + pos.PosY + pos.Height >= mousePos.Y {
+					clickable.OnClicked()
 				}
 			}
 		}

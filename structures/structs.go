@@ -64,8 +64,37 @@ type ISelectableComponent interface {
 	IsSelected() bool
 }
 
+type IInputField interface {
+	SetEditable(value bool)
+	IsEditable() bool
+	GetText() string
+	SetText(value string)
+	SetMaxCharacters(value int)
+	GetMaxCharacters() int
+}
+
+type IClickable interface {
+	IComponent
+	OnClicked()
+}
+
 type BasePanel struct {
 	Components []IComponent
+}
+
+type BaseInputField struct {
+	BaseSelectableComponent
+	Editable      bool
+	Text          string
+	MaxCharacters int
+	Callback      func(field IInputField)
+	timer float32
+}
+
+type BaseClickable struct {
+	BaseComponent
+	Label string
+	Callback func(label IClickable)
 }
 
 type BaseComponent struct {

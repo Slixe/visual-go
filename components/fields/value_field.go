@@ -6,29 +6,28 @@ import (
 )
 
 type ValueField struct {
-	structures.BaseSelectableComponent
-	Editable      bool
-	Text 		string
+	structures.BaseInputField
 	Value          int
 	MinValue int
 	MaxValue int
-	Callback      func(text ValueField)
 }
 
-func CreateValueField(text string, value int, minValue int, maxValue int, editable bool, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, onTextChanged func(text ValueField)) *ValueField {
+func CreateValueField(text string, value int, minValue int, maxValue int, editable bool, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, onTextChanged func(text structures.IInputField)) *ValueField {
 	return &ValueField{
-		BaseSelectableComponent: structures.BaseSelectableComponent{
-			BaseComponent: structures.BaseComponent{
-				Func: posFunc,
+		BaseInputField: structures.BaseInputField{
+			BaseSelectableComponent: structures.BaseSelectableComponent{
+				BaseComponent: structures.BaseComponent{
+					Func: posFunc,
+				},
+				Selected:      false,
 			},
-			Selected:      false,
+			Text: text,
+			Editable: editable,
+			Callback: onTextChanged,
 		},
-		Text: text,
 		Value:	value,
 		MinValue: minValue,
 		MaxValue: maxValue,
-		Editable: editable,
-		Callback: onTextChanged,
 	}
 }
 
@@ -46,7 +45,7 @@ func (field *ValueField) Show(graphics structures.IGraphics, app structures.IApp
 	}
 
 	if field.Value != val {
-		field.Callback(*field)
+		field.Callback(field)
 	}
 	field.Value = val
 }

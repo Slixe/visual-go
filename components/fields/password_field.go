@@ -7,25 +7,23 @@ import (
 )
 
 type PasswordField struct {
-	structures.BaseSelectableComponent
-	Editable      bool
-	Text          string
-	MaxCharacters int
-	Callback      func(password PasswordField)
+	structures.BaseInputField
 }
 
-func CreatePasswordField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, onTextChanged func(password PasswordField)) *PasswordField {
+func CreatePasswordField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, onTextChanged func(password structures.IInputField)) *PasswordField {
 	return &PasswordField{
-		BaseSelectableComponent: structures.BaseSelectableComponent{
-			BaseComponent: structures.BaseComponent{
-				Func: posFunc,
+		BaseInputField: structures.BaseInputField{
+			BaseSelectableComponent: structures.BaseSelectableComponent{
+				BaseComponent: structures.BaseComponent{
+					Func: posFunc,
+				},
+				Selected: false,
 			},
-			Selected: false,
+			Text:          text,
+			Editable:      editable,
+			MaxCharacters: maxChars,
+			Callback:      onTextChanged,
 		},
-		Text:          text,
-		Editable:      editable,
-		MaxCharacters: maxChars,
-		Callback:      onTextChanged,
 	}
 }
 
@@ -44,6 +42,6 @@ func (field *PasswordField) Show(graphics structures.IGraphics, app structures.I
 			field.Text += str[len(field.Text):]
 		}
 
-		field.Callback(*field)
+		field.Callback(field)
 	}
 }

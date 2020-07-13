@@ -7,25 +7,25 @@ import (
 )
 
 type TexturedButton struct {
-	structures.BaseComponent
-	Label    string
+	structures.BaseClickable
 	Texture  rl.Texture2D
-	Callback func(btn TexturedButton)
 }
 
-func CreateTexturedButton(label string, texturePath string, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, callback func(btn TexturedButton)) *TexturedButton {
+func CreateTexturedButton(label string, texturePath string, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, callback func(btn structures.IClickable)) *TexturedButton {
 	return &TexturedButton{
-		BaseComponent: structures.BaseComponent{
-			Func: posFunc,
+		BaseClickable: structures.BaseClickable{
+			BaseComponent: structures.BaseComponent{
+				Func: posFunc,
+			},
+			Label:    label,
+			Callback: callback,
 		},
-		Label:    label,
 		Texture:  graphics.LoadTexture(texturePath),
-		Callback: callback,
 	}
 }
 
 func (btn TexturedButton) Show(graphics structures.IGraphics, app structures.IApp) {
 	if rl.GuiImageButton(graphics.CreateRectangle(btn.GetPosition()), btn.Label, btn.Texture) {
-		btn.Callback(btn)
+		btn.Callback(&btn)
 	}
 }
