@@ -51,6 +51,10 @@ func (b BaseInputField) GetMaxCharacters() int {
 }
 
 func (b *BaseInputField) HandleKey() {
+	if !b.Editable || !b.Selected {
+		return
+	}
+
 	key := rl.GetKeyPressed()
 	if len(b.Text) < b.MaxCharacters {
 		strKey := string(key)

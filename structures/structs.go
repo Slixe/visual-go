@@ -46,6 +46,7 @@ type IGraphics interface {
 	DrawLine(startX int, startY int, endX int, endY int, color rl.Color)
 	CreateRectangle(component ComponentPos) rl.Rectangle
 	DrawRectangle(posX int, posY int, width int, height int, color rl.Color)
+	MeasureText(font rl.Font, text string, fontSize float32, spacing float32) rl.Vector2
 	GetWidth() float32
 	GetHeight() float32
 	GetPosX() float32

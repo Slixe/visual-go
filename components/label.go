@@ -8,16 +8,14 @@ import (
 type Label struct {
 	structures.BaseComponent
 	Label string
-	Color raylib.Color
 }
 
-func CreateLabel(label string, color raylib.Color, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos) *Label {
+func CreateLabel(label string, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos) *Label {
 	return &Label{
 		BaseComponent: structures.BaseComponent{
 			Func: posFunc,
 		},
 		Label: label,
-		Color: color,
 	}
 }
 

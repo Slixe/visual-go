@@ -59,7 +59,6 @@ func (g Graphics) DrawLine(startX int, startY int, endX int, endY int, color rl.
 }
 
 func (g Graphics) CreateRectangle(component structures.ComponentPos) rl.Rectangle {
-
 	if component.PosX < 0 {
 		component.PosX += g.maxWidth
 	}
@@ -89,6 +88,10 @@ func (g Graphics) DrawRectangle(posX int, posY int, width int, height int, color
 	}
 
 	rl.DrawRectangle(int(g.posX) + posX, int(g.posY) + posY, width, height, color)
+}
+
+func (g Graphics) MeasureText(font rl.Font, text string, fontSize float32, spacing float32) rl.Vector2 {
+	return rl.MeasureTextEx(font, text, fontSize, spacing)
 }
 
 func (g Graphics) GetWidth() float32 {
