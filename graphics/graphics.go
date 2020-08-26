@@ -11,6 +11,26 @@ type Graphics struct {
 	maxWidth float32
 	maxHeight float32
 }
+/*
+func (g Graphics) validatePosition(posX, posY float32) (float32, float32) {
+	if posX < 0 {
+		posX = 0
+	}
+
+	if posY < 0 {
+		posY = 0
+	}
+
+	if posX > g.maxWidth {
+		posX = g.maxWidth
+	}
+
+	if posY > g.maxHeight {
+		posY = g.maxHeight
+	}
+
+	return posX, posY
+}*/
 
 func (g Graphics) DrawTexture(texture rl.Texture2D, posX float32, posY float32, color rl.Color) {
 	rl.DrawTexture(texture, int(g.posX + posX), int(g.posY + posY), color)
@@ -31,10 +51,45 @@ func (g Graphics) DrawTexturePro(texture rl.Texture2D, posX float32, posY float3
 }
 
 func (g Graphics) DrawTextDefaultFont(text string, posX int, posY int, fontSize int, color rl.Color) {
+	vec := g.MeasureText(*rl.GetFontDefault(), text, float32(fontSize), 0)
+	if posX < 0 {
+		posX = 0
+	}
+
+	if posY < 0 {
+		posY = 0
+	}
+
+	if float32(posX) + vec.X > g.maxWidth {
+		posX = int(g.maxWidth - vec.X)
+	}
+
+	if float32(posY) + vec.Y > g.maxHeight {
+		posY = int(g.maxHeight - vec.Y)
+	}
+
 	rl.DrawText(text, int(g.posX) + posX, int(g.posY) + posY, fontSize, color)
 }
 
 func (g Graphics) DrawText(font rl.Font, text string, posX float32, posY float32, fontSize float32, spacing float32, color rl.Color) {
+	vec := g.MeasureText(font, text, fontSize, spacing)
+
+	if posX < 0 {
+		posX = 0
+	}
+
+	if posY < 0 {
+		posY = 0
+	}
+
+	if posX + vec.X > g.maxWidth {
+		posX = g.maxWidth - vec.X
+	}
+
+	if posY + vec.Y > g.maxHeight {
+		posY = g.maxHeight - vec.Y
+	}
+
 	rl.DrawTextEx(font, text, rl.Vector2{X: g.posX + posX, Y: g.posY + posY}, fontSize, spacing, color)
 }
 
