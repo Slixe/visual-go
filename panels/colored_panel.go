@@ -17,5 +17,5 @@ func CreateColoredPanel(color rl.Color) *ColoredPanel {
 }
 
 func (panel ColoredPanel) Show(graphics structures.IGraphics, app structures.IApp) {
-	graphics.DrawRectangle(0, 0, app.GetWidth(), app.GetHeight(), panel.Color)
+	graphics.DrawRectangle(0, 0, int(graphics.GetWidth()), int(graphics.GetHeight()), panel.Color)
 }

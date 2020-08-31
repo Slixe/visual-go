@@ -5,6 +5,9 @@ import (
 	"github.com/Slixe/visual-go/graphics"
 	"github.com/Slixe/visual-go/structures"
 	"github.com/kjk/flex"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 type Flex struct {
@@ -27,11 +30,9 @@ type App struct {
 	DefaultColor rl.Color
 	Flex         Flex
 	font         *rl.Font
-	globalPanel  structures.IPanel
 	layouts 	 map[string]*flex.Node
 	panels 		 map[structures.IPanel]panelInfo
-	components   []structures.IComponent //globals components
-	globalGraph structures.IGraphics
+	shouldClose bool
 }
 
 func (app *App) Start() {
@@ -53,59 +54,73 @@ func (app *App) Start() {
 	rl.InitWindow(app.Width, app.Height, app.Title)
 	rl.SetWindowMinSize(app.Width, app.Height)
 	rl.SetTargetFPS(app.TargetFPS)
+	rl.SetExitKey(0)
+
+	sigchan := make(chan os.Signal, 1)
+	signal.Notify(sigchan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	go func() {
+		<-sigchan
+		app.shouldClose = true
+	}()
 }
 
 func (app *App) Render() {
-	var currentSelected structures.ISelectableComponent
+	var currentSelected structures.ISelectable
 	lastWidth := app.GetWidth()
 	lastHeight := app.GetHeight()
 
 	app.CalculateLayout()
-	app.globalGraph = graphics.CreateGraphics(*app.Flex.RootNode)
-	for !rl.WindowShouldClose() {
-		var selectables = make(map[structures.IGraphics][]structures.ISelectableComponent)
-		var clickables = make(map[structures.IGraphics][]structures.IClickable)
-		var components = make(map[structures.IGraphics][]structures.IComponent)
+
+	for !rl.WindowShouldClose() && !app.shouldClose {
+		selectables := make(map[structures.IGraphics][]structures.ISelectable)
+		clickables := make(map[structures.IGraphics][]structures.IClickable)
+		wheelMove := rl.GetMouseWheelMove()
+		mousePos := rl.GetMousePosition()
 
 		if lastHeight != app.GetHeight() || lastWidth != app.GetWidth() {
 			lastWidth = app.GetWidth()
 			lastHeight = app.GetHeight()
 
 			app.CalculateLayout()
-			app.globalGraph = graphics.CreateGraphics(*app.Flex.RootNode)
 		}
 
 		rl.ClearBackground(app.DefaultColor)
 		rl.BeginDrawing()
 
-		if app.globalPanel != nil {
-			app.globalPanel.Show(app.globalGraph, app)
-			components[app.globalGraph] = append(components[app.globalGraph], app.globalPanel.GetComponents()...)
-		}
-
 		for panel, g := range app.panels {
+			rl.BeginScissorMode(int(g.graphics.GetPosX()), int(g.graphics.GetPosY()), int(g.graphics.GetWidth()), int(g.graphics.GetHeight())) //prevent drawing on each other
+			temp := g.graphics.AllowScroll()
+			g.graphics.ShouldAllowScroll(false)
 			panel.Show(g.graphics, app)
-			components[g.graphics] = append(components[g.graphics], panel.GetComponents()...)
-		}
+			g.graphics.ShouldAllowScroll(temp)
 
-		globalComponents := app.GetGlobalComponents()
-		components[app.globalGraph] = append(components[app.globalGraph], globalComponents...)
-		for graph, comps := range components {
-			for _, component := range comps {
-				if selectable, ok := component.(structures.ISelectableComponent); ok {
-					selectables[graph] = append(selectables[graph], selectable)
+			for _, component := range panel.GetComponents() {
+				if selectable, ok := component.(structures.ISelectable); ok {
+					selectables[g.graphics] = append(selectables[g.graphics], selectable)
 					if currentSelected == nil && selectable.IsSelected() {
 						currentSelected = selectable
 					}
 				} else if clickable, ok := component.(structures.IClickable); ok {
-					clickables[graph] = append(clickables[graph], clickable)
+					clickables[g.graphics] = append(clickables[g.graphics], clickable)
 				}
 
-				component.Show(graph, app)
+				component.Show(g.graphics, app)
 			}
+
+			if g.graphics.AllowScroll() && wheelMove != 0 && g.graphics.IsInArea2(mousePos.X, mousePos.Y) {
+				switch wheelMove {
+				case -1:
+					g.graphics.UpdateScroll(-5)
+				case 1:
+					g.graphics.UpdateScroll(5)
+				}
+				wheelMove = 0 //we only update one scrollable panel
+			}
+
+			rl.EndScissorMode()
 		}
 
-		if len(selectables) > 0 && currentSelected == nil {
+		if currentSelected == nil && len(selectables) > 0 {
 			for _, values := range selectables {
 				for _, selectable := range values {
 					currentSelected = selectable
@@ -116,17 +131,16 @@ func (app *App) Render() {
 			}
 		}
 
-		mousePos := rl.GetMousePosition()
 		tabKeyPressed := rl.IsKeyPressed(rl.KeyTab)
 		currentSelectedPassed := false
 		for graph, values := range selectables {
 			for i, selectable := range values {
-				pos := selectable.GetPosition()
-				if rl.IsMouseButtonPressed(rl.MouseLeftButton) && graph.GetPosX() + pos.PosX <= mousePos.X && graph.GetPosX() + pos.PosX + pos.Width >= mousePos.X && graph.GetPosY() + pos.PosY <= mousePos.Y && graph.GetPosY() + pos.PosY + pos.Height >= mousePos.Y {
+				if rl.IsMouseButtonPressed(rl.MouseLeftButton) && graph.IsInArea(selectable.GetPosition(), mousePos.X, mousePos.Y) {
 					currentSelected.SetSelected(false)
 					selectable.SetSelected(true)
 					currentSelected = selectable
-				} else if tabKeyPressed && (currentSelectedPassed || len(values) == i + 1 ) {
+					break
+				} else if tabKeyPressed && (currentSelectedPassed || len(values) == i + 1) {
 					currentSelected.SetSelected(false)
 					if currentSelectedPassed {
 						selectable.SetSelected(true)
@@ -136,6 +150,7 @@ func (app *App) Render() {
 						currentSelected = values[0]
 					}
 					tabKeyPressed = false
+					break
 				}
 
 				if selectable == currentSelected {
@@ -146,11 +161,12 @@ func (app *App) Render() {
 
 		for graph, values := range clickables {
 			for _, clickable := range values {
-				pos := clickable.GetPosition()
-				if rl.IsMouseButtonPressed(rl.MouseLeftButton) && graph.GetPosX() + pos.PosX <= mousePos.X && graph.GetPosX() + pos.PosX + pos.Width >= mousePos.X && graph.GetPosY() + pos.PosY <= mousePos.Y && graph.GetPosY() + pos.PosY + pos.Height >= mousePos.Y {
-					clickable.OnClicked()
+				if rl.IsMouseButtonPressed(rl.MouseLeftButton) && graph.IsInArea(clickable.GetPosition(), mousePos.X, mousePos.Y) {
+					clickable.Callback()
+					break //we can only click on one button at a time
 				}
 			}
+			break
 		}
 		rl.EndDrawing()
 	}
@@ -178,28 +194,10 @@ func (app *App) CalculateLayout() {
 			comp.UpdatePosition(graph, app)
 		}
 	}
-
-	globalComponents := app.GetGlobalComponents()
-	if app.globalPanel != nil {
-		globalComponents = append(globalComponents, app.globalPanel.GetComponents()...)
-	}
-
-	for _, c := range globalComponents {
-		c.UpdatePosition(app.globalGraph, app)
-	}
 }
 
 func (app *App) SetMainLayout(node *flex.Node) {
 	app.Flex.RootNode = node
-}
-
-func (app App) GetGlobalPanel() structures.IPanel {
-	return app.globalPanel
-}
-
-func (app *App) SetGlobalPanel(panel structures.IPanel) {
-	app.globalPanel = panel
-	app.CalculateLayout()
 }
 
 func (app App) GetWidth() int {
@@ -218,10 +216,10 @@ func (app App) GetMinHeight() int {
 	return app.Height
 }
 
-func (app *App) SetPanel(layoutName string, panel structures.IPanel) bool {
+func (app *App) SetPanel(layoutName string, panel structures.IPanel) {
 
 	if _, ok := app.layouts[layoutName]; !ok {
-		return false
+		panic("Layout '" + layoutName + "' doesn't exist!")
 	}
 
 	app.panels[panel] = panelInfo{
@@ -230,8 +228,6 @@ func (app *App) SetPanel(layoutName string, panel structures.IPanel) bool {
 	}
 
 	app.CalculateLayout()
-
-	return true
 }
 
 func (app *App) RemovePanel(panel structures.IPanel) {
@@ -256,6 +252,15 @@ func (app *App) ClearPanels() {
 }
 
 func (app *App) RegisterLayout(layoutName string, node *flex.Node) {
+	if app.Flex.RootNode == nil {
+		app.Flex.RootNode = flex.NewNodeWithConfig(app.Flex.FlexConfig)
+	}
+
+	app.RegisterLayoutChild(layoutName, node, app.Flex.RootNode)
+}
+
+func (app *App) RegisterLayoutChild(layoutName string, node *flex.Node, parent *flex.Node) {
+	parent.InsertChild(node, len(parent.Children))
 	app.layouts[layoutName] = node
 }
 
@@ -268,16 +273,8 @@ func (app *App) RemoveLayout(layoutName string) *flex.Node {
 	return v
 }
 
-func (app *App) ClearGlobalComponents() {
-	app.components = []structures.IComponent{}
-}
-
-func (app *App) AddGlobalComponent(component structures.IComponent) {
-	app.components = append(app.components, component)
-}
-
-func (app App) GetGlobalComponents() []structures.IComponent {
-	return app.components
+func (app App) NewLayout() *flex.Node {
+	return flex.NewNodeWithConfig(app.Flex.FlexConfig)
 }
 
 func (app App) SetWindowTitle(title string) {
@@ -296,4 +293,13 @@ func (app App) SetWindowIcon(imagePath string) {
 func (app *App) SetGuiFont(font *rl.Font) {
 	app.font = font
 	rl.GuiSetFont(*app.font)
+}
+
+func (app *App) SetTargetFPS(targetFPS int) {
+	app.TargetFPS = targetFPS
+	rl.SetTargetFPS(app.TargetFPS)
+}
+
+func (app App) GetFPS() int {
+	return rl.GetFPS()
 }

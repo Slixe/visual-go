@@ -10,7 +10,7 @@ type PasswordField struct {
 	structures.BaseInputField
 }
 
-func CreatePasswordField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, onTextChanged func(password structures.IInputField)) *PasswordField {
+func CreatePasswordField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f, onTextChanged func(password structures.IInputField)) *PasswordField {
 	return &PasswordField{
 		BaseInputField: structures.BaseInputField{
 			BaseSelectableComponent: structures.BaseSelectableComponent{

@@ -12,7 +12,7 @@ type CheckBox struct {
 	Callback func(box CheckBox)
 }
 
-func CreateCheckBox(label string, checked bool, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, callback func(box CheckBox)) *CheckBox {
+func CreateCheckBox(label string, checked bool, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f, callback func(box CheckBox)) *CheckBox {
 	return &CheckBox{
 		BaseComponent: structures.BaseComponent{
 			Func: posFunc,

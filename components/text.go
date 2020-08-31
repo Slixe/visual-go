@@ -14,7 +14,7 @@ type Text struct {
 	Color rl.Color
 }
 
-func CreateText(font rl.Font, text string, color rl.Color, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, fontSize float32, spacing float32) *Text {
+func CreateText(font rl.Font, text string, color rl.Color, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f, fontSize float32, spacing float32) *Text {
 	return &Text{
 		Text: text,
 		Font: font,

@@ -14,7 +14,7 @@ type CustomTextField struct {
 	draw bool
 }
 
-func CreateCustomTextField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, backgroundColor rl.Color, borderColor rl.Color, onTextChanged func(text structures.IInputField)) *CustomTextField {
+func CreateCustomTextField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f, backgroundColor rl.Color, borderColor rl.Color, onTextChanged func(text structures.IInputField)) *CustomTextField {
 	return &CustomTextField{
 		BaseInputField: structures.BaseInputField{
 			BaseSelectableComponent: structures.BaseSelectableComponent{

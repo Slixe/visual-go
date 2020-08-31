@@ -12,7 +12,7 @@ type ValueField struct {
 	MaxValue int
 }
 
-func CreateValueField(text string, value int, minValue int, maxValue int, editable bool, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, onTextChanged func(text structures.IInputField)) *ValueField {
+func CreateValueField(text string, value int, minValue int, maxValue int, editable bool, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f, onTextChanged func(text structures.IInputField)) *ValueField {
 	return &ValueField{
 		BaseInputField: structures.BaseInputField{
 			BaseSelectableComponent: structures.BaseSelectableComponent{

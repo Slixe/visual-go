@@ -12,7 +12,7 @@ type Image struct {
 	Color rl.Color
 }
 
-func CreateImage(texturePath string, color rl.Color, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos) *Image {
+func CreateImage(texturePath string, color rl.Color, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f) *Image {
 	return &Image{
 		Texture: graphics.LoadTexture(texturePath),
 		Color: color,

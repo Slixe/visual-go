@@ -10,11 +10,14 @@ var textures = map[string]rl.Texture2D{}
 var fonts = map[string]*rl.Font{}
 
 func CreateGraphics(node flex.Node) structures.IGraphics {
-	return Graphics{
-		posX: node.LayoutGetLeft(),
-		posY: node.LayoutGetTop(),
-		maxWidth: node.LayoutGetWidth(),
-		maxHeight: node.LayoutGetHeight(),
+	return &Graphics{
+		posX:        node.LayoutGetLeft(),
+		posY:        node.LayoutGetTop(),
+		maxWidth:    node.LayoutGetWidth(),
+		maxHeight:   node.LayoutGetHeight(),
+		scrollX:     0,
+		scrollY:     0,
+		allowScroll: false,
 	}
 }
 
@@ -42,14 +45,14 @@ func LoadTexture(texturePath string) rl.Texture2D {
 	return texture
 }
 
-func AbsPos(posX float32, posY float32, width float32, height float32) func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos {
-	return func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos {
+func AbsPos(posX float32, posY float32, width float32, height float32) func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f {
+	return func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f {
 		return Position(posX, posY, width, height)
 	}
 }
 
-func Position(posX float32, posY float32, width float32, height float32) structures.ComponentPos {
-	return structures.ComponentPos{
+func Position(posX float32, posY float32, width float32, height float32) structures.Vector4f {
+	return structures.Vector4f{
 		PosX:   posX,
 		PosY:   posY,
 		Width:  width,

@@ -9,7 +9,7 @@ type TextField struct {
 	structures.BaseInputField
 }
 
-func CreateTextField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, onTextChanged func(text structures.IInputField)) *TextField {
+func CreateTextField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f, onTextChanged func(text structures.IInputField)) *TextField {
 	return &TextField{
 		BaseInputField: structures.BaseInputField{
 			BaseSelectableComponent: structures.BaseSelectableComponent{

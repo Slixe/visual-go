@@ -13,7 +13,7 @@ type ComboBox struct {
 	Callback func(box ComboBox)
 }
 
-func CreateComboBox(values []string, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, callback func(box ComboBox)) *ComboBox {
+func CreateComboBox(values []string, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f, callback func(box ComboBox)) *ComboBox {
 	return &ComboBox{
 		BaseComponent: structures.BaseComponent{
 			Func: posFunc,

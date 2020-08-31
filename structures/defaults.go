@@ -1,6 +1,8 @@
 package structures
 
-import rl "github.com/DankFC/raylib-goplus/raylib"
+import (
+	rl "github.com/DankFC/raylib-goplus/raylib"
+)
 
 func (b BasePanel) GetComponents() []IComponent {
 	return b.Components
@@ -10,7 +12,7 @@ func (b *BasePanel) AddComponent(component IComponent) {
 	b.Components = append(b.Components, component)
 }
 
-func (b BaseComponent) GetPosition() ComponentPos {
+func (b BaseComponent) GetPosition() Vector4f {
 	return b.cachePos
 }
 
@@ -73,4 +75,6 @@ func (b *BaseInputField) HandleKey() {
 	}
 }
 
-func (b BaseClickable) OnClicked() {}
+func (b *BaseClickable) Callback() {
+	b.CallbackFunc(b)
+}

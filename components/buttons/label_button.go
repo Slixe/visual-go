@@ -9,20 +9,18 @@ type LabelButton struct {
 	structures.BaseClickable
 }
 
-func CreateLabelButton(label string, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, callback func(label structures.IClickable)) *LabelButton {
+func CreateLabelButton(label string, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f, callback func(label structures.IClickable)) *LabelButton {
 	return &LabelButton{
 		BaseClickable: structures.BaseClickable{
 			BaseComponent: structures.BaseComponent{
 				Func: posFunc,
 			},
-			Label:    label,
-			Callback: callback,
+			Label:        label,
+			CallbackFunc: callback,
 		},
 	}
 }
 
 func (btn LabelButton) Show(graphics structures.IGraphics, app structures.IApp) {
-	if rl.GuiLabelButton(graphics.CreateRectangle(btn.GetPosition()), btn.Label) {
-		btn.Callback(&btn)
-	}
+	rl.GuiLabelButton(graphics.CreateRectangle(btn.GetPosition()), btn.Label)
 }

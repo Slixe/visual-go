@@ -10,7 +10,7 @@ structures.BaseComponent
 Color rl.Color
 }
 
-func CreateLine(color rl.Color, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos) *Line {
+func CreateLine(color rl.Color, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f) *Line {
 	return &Line{
 		Color: color,
 		BaseComponent: structures.BaseComponent{

@@ -15,7 +15,7 @@ type CustomPasswordField struct {
 	draw bool
 }
 
-func CreateCustomPasswordField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos, backgroundColor rl.Color, borderColor rl.Color, onTextChanged func(text structures.IInputField)) *CustomPasswordField {
+func CreateCustomPasswordField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f, backgroundColor rl.Color, borderColor rl.Color, onTextChanged func(text structures.IInputField)) *CustomPasswordField {
 	return &CustomPasswordField{
 		BaseInputField: structures.BaseInputField{
 			BaseSelectableComponent: structures.BaseSelectableComponent{

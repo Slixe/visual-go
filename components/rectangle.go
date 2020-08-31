@@ -10,7 +10,7 @@ type Rectangle struct {
 	Color rl.Color
 }
 
-func CreateRectangle(color rl.Color, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos) *Rectangle {
+func CreateRectangle(color rl.Color, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f) *Rectangle {
 	return &Rectangle{
 		Color: color,
 		BaseComponent: structures.BaseComponent{
@@ -19,6 +19,6 @@ func CreateRectangle(color rl.Color, posFunc func(graphics structures.IGraphics,
 	}
 }
 
-func (line Rectangle) Show(graphics structures.IGraphics, app structures.IApp) {
-	graphics.DrawRectangle(int(line.GetPosition().PosX), int(line.GetPosition().PosY), int(line.GetPosition().Width), int(line.GetPosition().Height), line.Color)
+func (r Rectangle) Show(graphics structures.IGraphics, app structures.IApp) {
+	graphics.DrawRectangle(int(r.GetPosition().PosX), int(r.GetPosition().PosY), int(r.GetPosition().Width), int(r.GetPosition().Height), r.Color)
 }

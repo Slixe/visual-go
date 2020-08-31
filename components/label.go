@@ -10,7 +10,7 @@ type Label struct {
 	Label string
 }
 
-func CreateLabel(label string, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.ComponentPos) *Label {
+func CreateLabel(label string, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f) *Label {
 	return &Label{
 		BaseComponent: structures.BaseComponent{
 			Func: posFunc,
