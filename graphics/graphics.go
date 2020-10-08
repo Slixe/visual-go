@@ -1,7 +1,6 @@
 package graphics
 
 import (
-	"fmt"
 	"github.com/Slixe/visual-go/structures"
 	rl "github.com/lachee/raylib-goplus/raylib"
 	"math"
@@ -194,7 +193,6 @@ func (g *Graphics) SetupScroll(panel structures.IPanel, app structures.IApp) {
 			if g.verticalScroll.allowed && pos.PosY + pos.Height > g.GetHeight() && pos.PosY + pos.Height - g.GetHeight() > g.verticalScroll.maxValue { // Vertical
 				g.verticalScroll.scrollable = true
 				g.verticalScroll.maxValue = pos.PosY + pos.Height - (g.GetHeight() - 10)
-				fmt.Println(comp, g.verticalScroll.maxValue)
 			}
 			if g.horizontalScroll.allowed && pos.PosX + pos.Width > g.GetWidth() && pos.PosX + pos.Width - g.GetWidth() > g.horizontalScroll.maxValue { // Horizontal
 				g.horizontalScroll.scrollable = true
