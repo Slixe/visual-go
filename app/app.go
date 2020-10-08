@@ -61,6 +61,9 @@ func (app *App) Start() {
 	}
 	rl.SetExitKey(0)
 
+	if app.font == nil {
+		app.font = rl.GetFontDefault()
+	}
 	sigchan := make(chan os.Signal, 1)
 	signal.Notify(sigchan, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go func() {
@@ -111,30 +114,32 @@ func (app *App) Render() {
 				component.Show(g.graphics, app)
 			}
 
-			if wheelMove != 0 && g.graphics.CanScroll() && g.graphics.IsInArea2(mousePos.X, mousePos.Y) {
-				scrollValue := app.ScrollSpeed
-				if wheelMove == -1 {
-					scrollValue = -app.ScrollSpeed
-				}
-
-				var direction structures.ScrollDirection
-				if g.graphics.AllowScroll(structures.Vertical) {
-					if g.graphics.AllowScroll(structures.Horizontal) && rl.IsKeyDown(rl.KeyLeftShift) {
-						direction = structures.Horizontal
-					} else {
-						direction = structures.Vertical
+			if g.graphics.CanScroll() {
+				if wheelMove != 0 && g.graphics.IsInArea2(mousePos.X, mousePos.Y) {
+					scrollValue := app.ScrollSpeed
+					if wheelMove == -1 {
+						scrollValue = -app.ScrollSpeed
 					}
-				} else if g.graphics.AllowScroll(structures.Horizontal) {
-					direction = structures.Horizontal
+
+					var direction structures.ScrollDirection
+					if g.graphics.AllowScroll(structures.Vertical) {
+						if g.graphics.AllowScroll(structures.Horizontal) && rl.IsKeyDown(rl.KeyLeftShift) {
+							direction = structures.Horizontal
+						} else {
+							direction = structures.Vertical
+						}
+					} else if g.graphics.AllowScroll(structures.Horizontal) {
+						direction = structures.Horizontal
+					}
+
+					g.graphics.UpdateScroll(scrollValue, direction)
+					wheelMove = 0 //we only update one scrollable panel
 				}
 
-				g.graphics.UpdateScroll(scrollValue, direction)
-				wheelMove = 0 //we only update one scrollable panel
+				g.graphics.SkipScrollPadding(true)
+				g.graphics.DrawScrollBar(app, mousePos)
+				g.graphics.SkipScrollPadding(false)
 			}
-
-			g.graphics.SkipScrollPadding(true)
-			g.graphics.DrawScrollBar(app, mousePos)
-			g.graphics.SkipScrollPadding(false)
 
 			rl.EndScissorMode()
 		}
@@ -325,6 +330,10 @@ func (app *App) SetGuiFont(font *rl.Font) {
 func (app *App) SetTargetFPS(targetFPS int) {
 	app.TargetFPS = targetFPS
 	rl.SetTargetFPS(app.TargetFPS)
+}
+
+func (app App) GetFont() *rl.Font {
+	return app.font
 }
 
 func (app App) GetFPS() int {

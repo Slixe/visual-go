@@ -23,6 +23,10 @@ func UpdateGraphics(g Graphics, node flex.Node) structures.IGraphics {
 	g.posY = node.LayoutGetTop()
 	g.maxWidth = node.LayoutGetWidth()
 	g.maxHeight = node.LayoutGetHeight()
+	g.verticalScroll.scrollable = false
+	g.verticalScroll.maxValue = 0
+	g.horizontalScroll.scrollable = false
+	g.horizontalScroll.maxValue = 0
 
 	return &g
 }
@@ -30,13 +34,13 @@ func UpdateGraphics(g Graphics, node flex.Node) structures.IGraphics {
 func LoadFont(fontPath string, fontSize int) *rl.Font {
 	font, ok := fonts[fontPath]
 	if !ok {
-		font = rl.LoadFont(fontPath) //(fontPath, fontSize, nil, 256)
-		font.BaseSize = int32(fontSize)
+		font = rl.LoadFont(fontPath)
 		fonts[fontPath] = font
 	}
 
 	/*if font.BaseSize != int32(fontSize) {
-		return rl.LoadFontEx(fontPath, fontSize, 0, 256)
+		font, _ = rl.LoadFontEx(fontPath, fontSize, 0, 256)
+		fonts[fontPath] = font
 	}*/
 
 	return font
@@ -65,4 +69,8 @@ func Position(posX float32, posY float32, width float32, height float32) structu
 		Width:  width,
 		Height: height,
 	}
+}
+
+func MeasureText(font rl.Font, text string, fontSize float32, spacing float32) rl.Vector2 {
+	return rl.MeasureTextEx(font, text, fontSize, spacing)
 }

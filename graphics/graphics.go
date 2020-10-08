@@ -1,6 +1,7 @@
 package graphics
 
 import (
+	"fmt"
 	"github.com/Slixe/visual-go/structures"
 	rl "github.com/lachee/raylib-goplus/raylib"
 	"math"
@@ -38,13 +39,13 @@ func (g Graphics) DrawTexturePro(texture rl.Texture2D, posX float32, posY float3
 }
 
 func (g Graphics) DrawTextDefaultFont(text string, posX float32, posY float32, fontSize int, color rl.Color) {
-	vec := g.MeasureText(*rl.GetFontDefault(), text, float32(fontSize), 0)
+	vec := MeasureText(*rl.GetFontDefault(), text, float32(fontSize), 0)
 	g.ValidatePos(&posX, &posY, vec.X, vec.Y)
 	rl.DrawText(text, int(posX), int(posY), fontSize, color)
 }
 
 func (g Graphics) DrawText(font rl.Font, text string, posX float32, posY float32, fontSize float32, spacing float32, color rl.Color) {
-	vec := g.MeasureText(font, text, fontSize, spacing)
+	vec := MeasureText(font, text, fontSize, spacing)
 	g.ValidatePos(&posX, &posY, vec.X, vec.Y)
 	rl.DrawTextEx(font, text, rl.Vector2{X: posX, Y: posY}, fontSize, spacing, color)
 }
@@ -78,10 +79,6 @@ func (g Graphics) DrawRectangle(posX int, posY int, width int, height int, color
 
 	g.ValidatePos(&x, &y, float32(width), float32(height))
 	rl.DrawRectangle(int(x), int(y), width, height, color)
-}
-
-func (g Graphics) MeasureText(font rl.Font, text string, fontSize float32, spacing float32) rl.Vector2 {
-	return rl.MeasureTextEx(font, text, fontSize, spacing)
 }
 
 func (g *Graphics) ValidatePos(posX *float32, posY *float32, width float32, height float32) {
@@ -187,7 +184,7 @@ func (g Graphics) GetScrollMaxValue(direction structures.ScrollDirection) float3
 
 func (g *Graphics) SetupScroll(panel structures.IPanel, app structures.IApp) {
 	g.SetScrollFromPanel(panel)
-	if !g.CanScroll() {
+	if !g.horizontalScroll.allowed && !g.verticalScroll.allowed {
 		return
 	}
 
@@ -197,6 +194,7 @@ func (g *Graphics) SetupScroll(panel structures.IPanel, app structures.IApp) {
 			if g.verticalScroll.allowed && pos.PosY + pos.Height > g.GetHeight() && pos.PosY + pos.Height - g.GetHeight() > g.verticalScroll.maxValue { // Vertical
 				g.verticalScroll.scrollable = true
 				g.verticalScroll.maxValue = pos.PosY + pos.Height - (g.GetHeight() - 10)
+				fmt.Println(comp, g.verticalScroll.maxValue)
 			}
 			if g.horizontalScroll.allowed && pos.PosX + pos.Width > g.GetWidth() && pos.PosX + pos.Width - g.GetWidth() > g.horizontalScroll.maxValue { // Horizontal
 				g.horizontalScroll.scrollable = true
@@ -251,7 +249,7 @@ func (g *Graphics) UpdateScroll(value float32, direction structures.ScrollDirect
 }
 
 func (g *Graphics) CanScroll() bool {
-	return g.horizontalScroll.allowed || g.verticalScroll.allowed
+	return g.horizontalScroll.scrollable || g.verticalScroll.scrollable
 }
 
 func (g *Graphics) DrawScrollBar(app structures.IApp, mousePos rl.Vector2) {

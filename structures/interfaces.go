@@ -24,6 +24,7 @@ type IApp interface {
 	SetWindowIcon(imagePath string)
 	SetGuiFont(font *rl.Font)
 	SetTargetFPS(targetFPS int)
+	GetFont() *rl.Font
 	GetFPS() int
 }
 
@@ -53,7 +54,6 @@ type IGraphics interface {
 	DrawLine(startX int, startY int, endX int, endY int, color rl.Color)
 	CreateRectangle(component Vector4f) rl.Rectangle
 	DrawRectangle(posX int, posY int, width int, height int, color rl.Color)
-	MeasureText(font rl.Font, text string, fontSize float32, spacing float32) rl.Vector2
 	ValidatePos(posX *float32, posY *float32, width float32, height float32)
 	IsInArea(pos Vector4f, posX, posY float32) bool
 	IsInArea2(posX, posY float32) bool
