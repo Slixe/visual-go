@@ -1,8 +1,8 @@
 package fields
 
 import (
-	rl "github.com/DankFC/raylib-goplus/raylib"
 	"github.com/Slixe/visual-go/structures"
+	rl "github.com/lachee/raylib-goplus/raylib"
 	"strings"
 )
 
@@ -13,7 +13,7 @@ type PasswordField struct {
 func CreatePasswordField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f, onTextChanged func(password structures.IInputField)) *PasswordField {
 	return &PasswordField{
 		BaseInputField: structures.BaseInputField{
-			BaseSelectableComponent: structures.BaseSelectableComponent{
+			BaseSelectable: structures.BaseSelectable{
 				BaseComponent: structures.BaseComponent{
 					Func: posFunc,
 				},

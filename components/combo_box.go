@@ -1,8 +1,8 @@
 package components
 
 import (
-	"github.com/DankFC/raylib-goplus/raylib"
 	"github.com/Slixe/visual-go/structures"
+	"github.com/lachee/raylib-goplus/raylib"
 	"strings"
 )
 

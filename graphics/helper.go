@@ -1,9 +1,9 @@
 package graphics
 
 import (
-	rl "github.com/DankFC/raylib-goplus/raylib"
 	"github.com/Slixe/visual-go/structures"
 	"github.com/kjk/flex"
+	rl "github.com/lachee/raylib-goplus/raylib"
 )
 
 var textures = map[string]rl.Texture2D{}
@@ -15,22 +15,29 @@ func CreateGraphics(node flex.Node) structures.IGraphics {
 		posY:        node.LayoutGetTop(),
 		maxWidth:    node.LayoutGetWidth(),
 		maxHeight:   node.LayoutGetHeight(),
-		scrollX:     0,
-		scrollY:     0,
-		allowScroll: false,
 	}
+}
+
+func UpdateGraphics(g Graphics, node flex.Node) structures.IGraphics {
+	g.posX = node.LayoutGetLeft()
+	g.posY = node.LayoutGetTop()
+	g.maxWidth = node.LayoutGetWidth()
+	g.maxHeight = node.LayoutGetHeight()
+
+	return &g
 }
 
 func LoadFont(fontPath string, fontSize int) *rl.Font {
 	font, ok := fonts[fontPath]
 	if !ok {
-		font = rl.LoadFontEx(fontPath, fontSize, nil, 256)
+		font = rl.LoadFont(fontPath) //(fontPath, fontSize, nil, 256)
+		font.BaseSize = int32(fontSize)
 		fonts[fontPath] = font
 	}
 
-	if font.BaseSize != int32(fontSize) {
-		return rl.LoadFontEx(fontPath, fontSize, nil, 256)
-	}
+	/*if font.BaseSize != int32(fontSize) {
+		return rl.LoadFontEx(fontPath, fontSize, 0, 256)
+	}*/
 
 	return font
 }

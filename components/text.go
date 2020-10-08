@@ -1,8 +1,8 @@
 package components
 
 import (
-	rl "github.com/DankFC/raylib-goplus/raylib"
 	"github.com/Slixe/visual-go/structures"
+	rl "github.com/lachee/raylib-goplus/raylib"
 )
 
 type Text struct {

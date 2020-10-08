@@ -1,12 +1,13 @@
 package buttons
 
 import (
-	rl "github.com/DankFC/raylib-goplus/raylib"
 	"github.com/Slixe/visual-go/structures"
+	rl "github.com/lachee/raylib-goplus/raylib"
 )
 
 type Button struct {
 	structures.BaseClickable
+	Label string
 }
 
 func CreateButton(label string, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f, callback func(label structures.IClickable)) *Button {
@@ -15,9 +16,9 @@ func CreateButton(label string, posFunc func(graphics structures.IGraphics, app 
 			BaseComponent: structures.BaseComponent{
 				Func: posFunc,
 			},
-			Label:        label,
 			CallbackFunc: callback,
 		},
+		Label: label,
 	}
 }
 

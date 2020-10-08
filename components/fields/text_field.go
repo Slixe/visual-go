@@ -1,8 +1,8 @@
 package fields
 
 import (
-	rl "github.com/DankFC/raylib-goplus/raylib"
 	"github.com/Slixe/visual-go/structures"
+	rl "github.com/lachee/raylib-goplus/raylib"
 )
 
 type TextField struct {
@@ -12,7 +12,7 @@ type TextField struct {
 func CreateTextField(text string, editable bool, maxChars int, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f, onTextChanged func(text structures.IInputField)) *TextField {
 	return &TextField{
 		BaseInputField: structures.BaseInputField{
-			BaseSelectableComponent: structures.BaseSelectableComponent{
+			BaseSelectable: structures.BaseSelectable{
 				BaseComponent: structures.BaseComponent{
 					Func: posFunc,
 				},

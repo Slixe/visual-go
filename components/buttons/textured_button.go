@@ -1,24 +1,26 @@
 package buttons
 
 import (
-	rl "github.com/DankFC/raylib-goplus/raylib"
 	"github.com/Slixe/visual-go/graphics"
 	"github.com/Slixe/visual-go/structures"
+	rl "github.com/lachee/raylib-goplus/raylib"
 )
 
 type TexturedButton struct {
-	structures.BaseClickable
+	Button
 	Texture  rl.Texture2D
 }
 
 func CreateTexturedButton(label string, texturePath string, posFunc func(graphics structures.IGraphics, app structures.IApp) structures.Vector4f, callback func(btn structures.IClickable)) *TexturedButton {
 	return &TexturedButton{
-		BaseClickable: structures.BaseClickable{
-			BaseComponent: structures.BaseComponent{
-				Func: posFunc,
+		Button: Button{
+			BaseClickable: structures.BaseClickable{
+				BaseComponent: structures.BaseComponent{
+					Func: posFunc,
+				},
+				CallbackFunc: callback,
 			},
-			Label:        label,
-			CallbackFunc: callback,
+			Label: label,
 		},
 		Texture:  graphics.LoadTexture(texturePath),
 	}

@@ -1,23 +1,14 @@
 package structures
 
 import (
-	rl "github.com/DankFC/raylib-goplus/raylib"
 	"github.com/kjk/flex"
-)
-
-type ScrollDirection int
-
-const (
-	Horizontal ScrollDirection = iota
-	Vertical
+	rl "github.com/lachee/raylib-goplus/raylib"
 )
 
 type IApp interface {
 	Close()
 	CalculateLayout()
 	SetMainLayout(node *flex.Node)
-	/*GetGlobalPanel() IPanel
-	SetGlobalPanel(panel IPanel)*/
 	GetWidth() int
 	GetHeight() int
 	SetPanel(layoutName string, panel IPanel)
@@ -28,9 +19,6 @@ type IApp interface {
 	RegisterLayoutChild(layoutName string, node *flex.Node, parent *flex.Node)
 	RemoveLayout(layoutName string) *flex.Node
 	NewLayout() *flex.Node
-	/*AddGlobalComponent(component IComponent)
-	GetGlobalComponents() []IComponent
-	ClearGlobalComponents()*/
 	SetWindowTitle(title string)
 	SetWindowSize(width int, height int)
 	SetWindowIcon(imagePath string)
@@ -47,6 +35,8 @@ type IPanel interface {
 	IShow
 	GetComponents() []IComponent
 	AddComponent(component IComponent)
+	SetAllowScroll(value bool, direction ScrollDirection)
+	AllowScroll(direction ScrollDirection) bool
 }
 
 type IScrollable interface {
@@ -64,7 +54,6 @@ type IGraphics interface {
 	CreateRectangle(component Vector4f) rl.Rectangle
 	DrawRectangle(posX int, posY int, width int, height int, color rl.Color)
 	MeasureText(font rl.Font, text string, fontSize float32, spacing float32) rl.Vector2
-	UpdateScroll(value float32)
 	ValidatePos(posX *float32, posY *float32, width float32, height float32)
 	IsInArea(pos Vector4f, posX, posY float32) bool
 	IsInArea2(posX, posY float32) bool
@@ -73,9 +62,17 @@ type IGraphics interface {
 	GetHeight() float32
 	GetPosX() float32
 	GetPosY() float32
-	ShouldAllowScroll(value bool)
-	AllowScroll() bool
-
+	SetAllowScroll(value bool, direction ScrollDirection)
+	AllowScroll(direction ScrollDirection) bool
+	DisableScroll()
+	SetScrollFromPanel(panel IPanel)
+	GetScrollValue(direction ScrollDirection) float32
+	GetScrollMaxValue(direction ScrollDirection) float32
+	SetupScroll(panel IPanel, app IApp)
+	UpdateScroll(value float32, direction ScrollDirection)
+	CanScroll() bool
+	DrawScrollBar(app IApp, mousePos rl.Vector2)
+	SkipScrollPadding(value bool)
 }
 
 type IComponent interface {
@@ -103,4 +100,6 @@ type IInputField interface {
 type IClickable interface {
 	IComponent
 	Callback()
+	GetClickedPosition() rl.Vector2
+	SetClickedPosition(position rl.Vector2)
 }

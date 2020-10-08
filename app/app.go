@@ -1,10 +1,10 @@
 package app
 
 import (
-	rl "github.com/DankFC/raylib-goplus/raylib"
 	"github.com/Slixe/visual-go/graphics"
 	"github.com/Slixe/visual-go/structures"
 	"github.com/kjk/flex"
+	rl "github.com/lachee/raylib-goplus/raylib"
 	"os"
 	"os/signal"
 	"syscall"
@@ -27,8 +27,11 @@ type App struct {
 	Height       int
 	Resizable    bool
 	TargetFPS	 int
+	DrawFPS 	 bool
+	ScrollSpeed float32
 	DefaultColor rl.Color
 	Flex         Flex
+	OnClose 	 func()
 	font         *rl.Font
 	layouts 	 map[string]*flex.Node
 	panels 		 map[structures.IPanel]panelInfo
@@ -43,8 +46,8 @@ func (app *App) Start() {
 		rl.SetConfigFlags(rl.FlagWindowResizable)
 	}
 
-	if app.TargetFPS == 0 {
-		app.TargetFPS = 60
+	if app.ScrollSpeed == 0 {
+		app.ScrollSpeed = 5
 	}
 
 	if app.Flex.FlexConfig == nil {
@@ -53,7 +56,9 @@ func (app *App) Start() {
 
 	rl.InitWindow(app.Width, app.Height, app.Title)
 	rl.SetWindowMinSize(app.Width, app.Height)
-	rl.SetTargetFPS(app.TargetFPS)
+	if app.TargetFPS != 0 {
+		rl.SetTargetFPS(app.TargetFPS)
+	}
 	rl.SetExitKey(0)
 
 	sigchan := make(chan os.Signal, 1)
@@ -89,10 +94,9 @@ func (app *App) Render() {
 
 		for panel, g := range app.panels {
 			rl.BeginScissorMode(int(g.graphics.GetPosX()), int(g.graphics.GetPosY()), int(g.graphics.GetWidth()), int(g.graphics.GetHeight())) //prevent drawing on each other
-			temp := g.graphics.AllowScroll()
-			g.graphics.ShouldAllowScroll(false)
+			g.graphics.DisableScroll()
 			panel.Show(g.graphics, app)
-			g.graphics.ShouldAllowScroll(temp)
+			g.graphics.SetScrollFromPanel(panel)
 
 			for _, component := range panel.GetComponents() {
 				if selectable, ok := component.(structures.ISelectable); ok {
@@ -107,18 +111,38 @@ func (app *App) Render() {
 				component.Show(g.graphics, app)
 			}
 
-			if g.graphics.AllowScroll() && wheelMove != 0 && g.graphics.IsInArea2(mousePos.X, mousePos.Y) {
-				switch wheelMove {
-				case -1:
-					g.graphics.UpdateScroll(-5)
-				case 1:
-					g.graphics.UpdateScroll(5)
+			if wheelMove != 0 && g.graphics.CanScroll() && g.graphics.IsInArea2(mousePos.X, mousePos.Y) {
+				scrollValue := app.ScrollSpeed
+				if wheelMove == -1 {
+					scrollValue = -app.ScrollSpeed
 				}
+
+				var direction structures.ScrollDirection
+				if g.graphics.AllowScroll(structures.Vertical) {
+					if g.graphics.AllowScroll(structures.Horizontal) && rl.IsKeyDown(rl.KeyLeftShift) {
+						direction = structures.Horizontal
+					} else {
+						direction = structures.Vertical
+					}
+				} else if g.graphics.AllowScroll(structures.Horizontal) {
+					direction = structures.Horizontal
+				}
+
+				g.graphics.UpdateScroll(scrollValue, direction)
 				wheelMove = 0 //we only update one scrollable panel
 			}
 
+			g.graphics.SkipScrollPadding(true)
+			g.graphics.DrawScrollBar(app, mousePos)
+			g.graphics.SkipScrollPadding(false)
+
 			rl.EndScissorMode()
 		}
+
+		if app.DrawFPS {
+			rl.DrawFPS(0, 0)
+		}
+		rl.EndDrawing()
 
 		if currentSelected == nil && len(selectables) > 0 {
 			for _, values := range selectables {
@@ -162,13 +186,12 @@ func (app *App) Render() {
 		for graph, values := range clickables {
 			for _, clickable := range values {
 				if rl.IsMouseButtonPressed(rl.MouseLeftButton) && graph.IsInArea(clickable.GetPosition(), mousePos.X, mousePos.Y) {
+					clickable.SetClickedPosition(mousePos)
 					clickable.Callback()
 					break //we can only click on one button at a time
 				}
 			}
-			break
 		}
-		rl.EndDrawing()
 	}
 
 	app.Close()
@@ -176,6 +199,9 @@ func (app *App) Render() {
 
 func (app App) Close() {
 	rl.CloseWindow()
+	if app.OnClose != nil {
+		app.OnClose()
+	}
 }
 
 func (app *App) CalculateLayout() {
@@ -186,13 +212,14 @@ func (app *App) CalculateLayout() {
 	flex.CalculateLayout(app.Flex.RootNode, float32(app.GetWidth()), float32(app.GetHeight()), app.Flex.Direction)
 
 	for panel, info := range app.panels {
-		graph := graphics.CreateGraphics(*app.layouts[info.layoutName])
-		info.graphics = graph
+		info.graphics = graphics.UpdateGraphics(*info.graphics.(*graphics.Graphics), *app.layouts[info.layoutName])
 		app.panels[panel] = info
 
 		for _, comp := range panel.GetComponents() {
-			comp.UpdatePosition(graph, app)
+			comp.UpdatePosition(info.graphics, app)
 		}
+
+		info.graphics.SetupScroll(panel, app)
 	}
 }
 

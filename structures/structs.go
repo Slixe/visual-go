@@ -1,7 +1,18 @@
 package structures
 
+import rl "github.com/lachee/raylib-goplus/raylib"
+
+type ScrollDirection int
+
+const (
+	Horizontal ScrollDirection = iota
+	Vertical
+)
+
 type BasePanel struct {
 	Components []IComponent
+	allowVerticalScroll bool
+	allowHorizontalScroll bool
 }
 
 type BaseComponent struct {
@@ -11,7 +22,7 @@ type BaseComponent struct {
 }
 
 type BaseInputField struct {
-	BaseSelectableComponent
+	BaseSelectable
 	Editable      bool
 	Text          string
 	MaxCharacters int
@@ -21,8 +32,13 @@ type BaseInputField struct {
 
 type BaseClickable struct {
 	BaseComponent
-	Label        string
-	CallbackFunc func(label IClickable)
+	CallbackFunc func(clickable IClickable)
+	clickedPos rl.Vector2
+}
+
+type BaseSelectable struct {
+	BaseComponent
+	Selected bool
 }
 
 type Vector4f struct {
@@ -30,9 +46,4 @@ type Vector4f struct {
 	PosY   float32
 	Width  float32
 	Height float32
-}
-
-type BaseSelectableComponent struct {
-	BaseComponent
-	Selected bool
 }
