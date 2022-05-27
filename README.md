@@ -62,3 +62,5 @@ func main() {
 	window.Render() //start rendering
 }
 ```
+### Scaling Example
+![scale example](https://github.com/Slixe/visual-go/blob/master/scale_example.gif?raw=true)
