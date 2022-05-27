@@ -64,3 +64,6 @@ func main() {
 ```
 ### Scaling Example
 ![scale example](https://github.com/Slixe/visual-go/blob/master/scale_example.gif?raw=true)
+
+### Animation Example
+![Animation example](https://github.com/Slixe/visual-go/blob/master/animation_example.gif?raw=true)
